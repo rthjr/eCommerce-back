@@ -54,10 +54,10 @@ public class AuthService {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
+        Role userRole = roleRepository.findByName("ROLE_CUSTOMER")
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         
-        user.getRoles().add("ROLE_USER");
+        user.getRoles().add("ROLE_CUSTOMER");
 
         User savedUser = userRepository.save(user);
 
@@ -73,7 +73,7 @@ public class AuthService {
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
-                List.of("ROLE_USER")
+                List.of("ROLE_CUSTOMER")
         );
 
         return new JwtResponse(

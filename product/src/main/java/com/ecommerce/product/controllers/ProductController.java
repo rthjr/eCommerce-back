@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,13 +36,25 @@ public class ProductController {
 	private final ProductService productService;
 
 	@PostMapping
-	public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
-		return new ResponseEntity<ProductResponse>(productService.createProduct(productRequest), HttpStatus.CREATED);
+	public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest,
+			@RequestHeader(value = "X-User-Id", required = false) String sellerId,
+			@RequestHeader(value = "X-User-Name", required = false) String sellerName) {
+		return new ResponseEntity<ProductResponse>(productService.createProduct(productRequest, sellerId, sellerName),
+				HttpStatus.CREATED);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<ProductResponse>> getProducts() {
+	public ResponseEntity<List<ProductResponse>> getProducts(@RequestParam(required = false) String sellerId) {
+		if (sellerId != null && !sellerId.isEmpty()) {
+			return ResponseEntity.ok(productService.getProductsBySellerId(sellerId));
+		}
 		return ResponseEntity.ok(productService.getAllProducts());
+	}
+
+	@GetMapping("/owner")
+	public ResponseEntity<List<ProductResponse>> getOwnerProducts(
+			@RequestHeader(value = "X-User-Id", required = true) String sellerId) {
+		return ResponseEntity.ok(productService.getOwnerProducts(sellerId));
 	}
 
 	@PutMapping("/{id}")
@@ -108,6 +121,11 @@ public class ProductController {
 	@PostMapping("/{productId}/faqs")
 	public ResponseEntity<FAQResponse> createFAQ(@PathVariable Long productId, @RequestBody FAQRequest faqRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(productService.createFAQ(productId, faqRequest));
+	}
+
+	@GetMapping("/seller/{sellerId}")
+	public ResponseEntity<List<ProductResponse>> getProductsBySeller(@PathVariable String sellerId) {
+		return ResponseEntity.ok(productService.getProductsBySellerId(sellerId));
 	}
 
 }

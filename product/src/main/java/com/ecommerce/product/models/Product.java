@@ -33,7 +33,7 @@ public class Product {
 	private BigDecimal price;
 	private Integer stockQuantity;
 	private String category;
-	private Long sellerId;
+	private String sellerId;
 	private String sellerName;
 
 	@Deprecated

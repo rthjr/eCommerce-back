@@ -36,13 +36,29 @@ public class ProductService {
 	private final ProductReviewRepository reviewRepository;
 	private final ProductFAQRepository faqRepository;
 
-	public ProductResponse createProduct(ProductRequest productRequest) {
+	public ProductResponse createProduct(ProductRequest productRequest, String sellerId, String sellerName) {
 		Product product = new Product();
 		updateProductFromRequest(product, productRequest);
+		
+		// Set seller information
+		if (sellerId != null && !sellerId.isEmpty()) {
+			product.setSellerId(sellerId);
+		}
+		if (sellerName != null && !sellerName.isEmpty()) {
+			product.setSellerName(sellerName);
+		}
+		
 		Product savedProduct = productRepository.save(product);
 		return mapToProductResponse(savedProduct);
 	}
 
+	public List<ProductResponse> getOwnerProducts(String sellerId) {
+	    return productRepository.findBySellerIdOrderByCreatedAtDesc(sellerId).stream()
+	        .map(this::mapToProductResponse)
+	        .collect(Collectors.toList());
+	}
+
+	
 	private ProductResponse mapToProductResponse(Product savedProduct) {
 		ProductResponse response = new ProductResponse();
 		response.setId(savedProduct.getId());
@@ -52,6 +68,8 @@ public class ProductService {
 		response.setDescription(savedProduct.getDescription());
 		response.setPrice(savedProduct.getPrice());
 		response.setStockQuantity(savedProduct.getStockQuantity());
+		response.setSellerId(savedProduct.getSellerId());
+		response.setSellerName(savedProduct.getSellerName());
 
 		// Set new fields
 		response.setBrand(savedProduct.getBrand());
@@ -81,6 +99,11 @@ public class ProductService {
 		product.setDescription(productRequest.getDescription());
 		product.setPrice(productRequest.getPrice());
 		product.setStockQuantity(productRequest.getStockQuantity());
+		
+		// Update active status if provided
+		if (productRequest.getActive() != null) {
+			product.setActive(productRequest.getActive());
+		}
 
 		// Handle image URL migration
 		if (productRequest.getImageUrl() != null) {
@@ -92,6 +115,7 @@ public class ProductService {
 
 	public Optional<ProductResponse> updateProduct(Long id, ProductRequest productRequest) {
 		return productRepository.findById(id).map(existingProduct -> {
+			// TODO: Add ownership validation in controller
 			updateProductFromRequest(existingProduct, productRequest);
 			Product savedProduct = productRepository.save(existingProduct);
 			return mapToProductResponse(savedProduct);
@@ -105,6 +129,7 @@ public class ProductService {
 
 	public boolean deleteProduct(Long id) {
 		return productRepository.findById(id).map(product -> {
+			// TODO: Add ownership validation in controller
 			product.setActive(false);
 			productRepository.save(product);
 			return true;
@@ -215,6 +240,12 @@ public class ProductService {
 
 		ProductFAQ saved = faqRepository.save(faq);
 		return mapToFAQResponse(saved);
+	}
+
+	public List<ProductResponse> getProductsBySellerId(String sellerId) {
+		return productRepository.findBySellerId(sellerId).stream()
+				.map(this::mapToProductResponse)
+				.collect(Collectors.toList());
 	}
 
 }

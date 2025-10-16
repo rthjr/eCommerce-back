@@ -227,6 +227,9 @@ public class ProductDataInitializer {
 		p.setRating(rating);
 		p.setNumReviews(numReviews);
 		p.setActive(true);
+		p.setSellerId("demo-seller-001");
+		p.setSellerName("Demo Store");
 		return p;
 	}
+
 }

@@ -14,6 +14,8 @@ public class ProductResponse {
     private BigDecimal price;
     private Integer stockQuantity;
     private String category;
+    private String sellerId;
+    private String sellerName;
     private String imageUrl; // Deprecated, kept for backward compatibility
     private Boolean active;
 

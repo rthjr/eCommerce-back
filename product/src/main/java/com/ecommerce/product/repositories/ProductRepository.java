@@ -21,4 +21,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     @Query("SELECT p FROM products p WHERE p.active = true AND p.stockQuantity > 0 AND LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Product> searchProducts(@Param("keyword") String keyword);
+    
+    List<Product> findBySellerId(String sellerId);
+    
+    List<Product> findBySellerIdOrderByCreatedAtDesc(String sellerId);
+
 }
