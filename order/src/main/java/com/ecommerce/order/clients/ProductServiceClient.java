@@ -1,14 +1,19 @@
 package com.ecommerce.order.clients;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PutExchange;
 
 import com.ecommerce.order.dtos.ProductResponse;
 
 @HttpExchange
 public interface ProductServiceClient {
 
-    @GetExchange("/api/products/{id}")
-    ProductResponse getProductDetails(@PathVariable String id);
+	@GetExchange("/api/products/{id}")
+	ProductResponse getProductDetails(@PathVariable String id);
+
+	@PutExchange("/api/products/{id}/reduce-stock")
+	void reduceStock(@PathVariable String id, @RequestParam Integer quantity);
 }

@@ -247,5 +247,20 @@ public class ProductService {
 				.map(this::mapToProductResponse)
 				.collect(Collectors.toList());
 	}
+	
+	// In ProductService
+	public boolean reduceStock(Long productId, Integer quantity) {
+	    return productRepository.findById(productId)
+	        .map(product -> {
+	            if (product.getStockQuantity() >= quantity) {
+	                product.setStockQuantity(product.getStockQuantity() - quantity);
+	                productRepository.save(product);
+	                return true;
+	            }
+	            return false; // Insufficient stock
+	        })
+	        .orElse(false); // Product not found
+	}
+
 
 }

@@ -40,7 +40,6 @@ services:
     networks:
       - backend
     restart: unless-stopped
-
 networks:
   backend:
     driver: bridge

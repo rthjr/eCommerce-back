@@ -127,5 +127,13 @@ public class ProductController {
 	public ResponseEntity<List<ProductResponse>> getProductsBySeller(@PathVariable String sellerId) {
 		return ResponseEntity.ok(productService.getProductsBySellerId(sellerId));
 	}
+	
+	// In ProductController
+	@PutMapping("/{id}/reduce-stock")
+	public ResponseEntity<Void> reduceStock(@PathVariable Long id, @RequestParam Integer quantity) {
+	    boolean reduced = productService.reduceStock(id, quantity);
+	    return reduced ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	}
+
 
 }
