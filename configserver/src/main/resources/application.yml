@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: configserver
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:////C:\Users\sovan\Desktop\Defend Project\fullstack\ecom-applications\configserver\src\main\resources\config
+  rabbitmq:
+    host: localhost
+    port: 5672
+    password: guest
+    username: guest
+#          search-locations: classpath:/config
+
+server:
+  port: 8888
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
