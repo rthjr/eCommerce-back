@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/
+      uri: mongodb+srv://sovannarithphan9_db_user:4TjhTw5-bQg824p@user-data.unip0bf.mongodb.net/?appName=user-data
       database: ecom_user
   rabbitmq:
     host: localhost

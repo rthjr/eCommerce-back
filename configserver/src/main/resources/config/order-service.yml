@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/order
-    username: rthjr
-    password: rthjr
+    username: embarkx
+    password: embarkx
   rabbitmq:
     host: localhost
     port: 5672
