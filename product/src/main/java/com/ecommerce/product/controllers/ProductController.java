@@ -59,10 +59,13 @@ public class ProductController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
-			@RequestBody ProductRequest productRequest) {
-		return productService.updateProduct(id, productRequest).map(ResponseEntity::ok)
-				.orElseGet(() -> ResponseEntity.notFound().build());
+	        @RequestBody ProductRequest productRequest) {
+	    return productService.updateProduct(id, productRequest)
+	        .map(ResponseEntity::ok)
+	        .orElseGet(() -> ResponseEntity.notFound().build());
 	}
+
+
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {

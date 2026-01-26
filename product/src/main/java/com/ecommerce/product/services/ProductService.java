@@ -1,6 +1,10 @@
 package com.ecommerce.product.services;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -94,24 +98,44 @@ public class ProductService {
 	}
 
 	private void updateProductFromRequest(Product product, ProductRequest productRequest) {
-		product.setName(productRequest.getName());
-		product.setCategory(productRequest.getCategory());
-		product.setDescription(productRequest.getDescription());
-		product.setPrice(productRequest.getPrice());
-		product.setStockQuantity(productRequest.getStockQuantity());
-		
-		// Update active status if provided
-		if (productRequest.getActive() != null) {
-			product.setActive(productRequest.getActive());
-		}
+	    product.setName(productRequest.getName());
+	    product.setCategory(productRequest.getCategory());
+	    product.setDescription(productRequest.getDescription());
+	    product.setPrice(productRequest.getPrice());
+	    product.setStockQuantity(productRequest.getStockQuantity());
+	    
+	    if (productRequest.getActive() != null) {
+	        product.setActive(productRequest.getActive());
+	    }
 
-		// Handle image URL migration
-		if (productRequest.getImageUrl() != null) {
-			// For backward compatibility, add to imageUrls list
-			product.getImageUrls().clear();
-			product.getImageUrls().add(productRequest.getImageUrl());
-		}
+	    // Handle base64 image
+	    if (productRequest.getImageUrl() != null && productRequest.getImageUrl().startsWith("data:image/")) {
+	        String savedImageUrl = saveBase64Image(productRequest.getImageUrl());
+	        product.getImageUrls().clear();
+	        product.getImageUrls().add(savedImageUrl);
+	    }
 	}
+
+	private String saveBase64Image(String base64Image) {
+	    try {
+	        String[] parts = base64Image.split(",");
+	        String imageData = parts[1];
+	        String format = parts[0].split("/")[1].split(";")[0];
+	        
+	        byte[] decodedBytes = Base64.getDecoder().decode(imageData);
+	        String fileName = "product_" + System.currentTimeMillis() + "." + format;
+	        
+	        // Save to uploads directory
+	        Path uploadPath = Paths.get("uploads");
+	        Files.createDirectories(uploadPath);
+	        Files.write(uploadPath.resolve(fileName), decodedBytes);
+	        
+	        return "/uploads/" + fileName;
+	    } catch (Exception e) {
+	        throw new RuntimeException("Failed to save image", e);
+	    }
+	}
+
 
 	public Optional<ProductResponse> updateProduct(Long id, ProductRequest productRequest) {
 		return productRepository.findById(id).map(existingProduct -> {
