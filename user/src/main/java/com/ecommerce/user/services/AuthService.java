@@ -54,9 +54,6 @@ public class AuthService {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-        Role userRole = roleRepository.findByName("ROLE_CUSTOMER")
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        
         user.getRoles().add("ROLE_CUSTOMER");
 
         User savedUser = userRepository.save(user);
