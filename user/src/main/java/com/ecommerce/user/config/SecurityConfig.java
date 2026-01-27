@@ -70,7 +70,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        // CORS is now handled by the API Gateway - disabled here to prevent duplicate headers
+        http.cors(cors -> cors.disable())
             .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -99,6 +100,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // CORS configuration removed - now handled by API Gateway
+    // This prevents duplicate Access-Control-Allow-Origin headers
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -112,4 +116,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    */
 }
