@@ -21,6 +21,12 @@ public class GateWayConfig {
 //                        .filters(f -> f.rewritePath("/users(?<segment>/?.*)",
 //                                "/api/users${segment}"))
                         .uri("lb://USER-SERVICE"))
+                .route("auth-service", r -> r
+                        .path("/api/auth/**")
+                        .uri("lb://USER-SERVICE"))
+                .route("oauth2-service", r -> r
+                        .path("/api/oauth2/**")
+                        .uri("lb://USER-SERVICE"))
                 .route("order-service", r -> r
                         .path("/api/orders/**", "/api/cart/**")
 //                        .filters(f -> f.rewritePath("/(?<segment>.*)",
