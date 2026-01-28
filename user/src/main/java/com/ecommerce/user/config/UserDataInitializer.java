@@ -6,16 +6,22 @@ import org.springframework.stereotype.Component;
 
 import com.ecommerce.user.models.Role;
 import com.ecommerce.user.repository.RoleRepository;
+import com.ecommerce.user.repository.UserRepository;
+import com.ecommerce.user.utils.StaticUsers;
 
 @Component
 public class UserDataInitializer implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void run(String... args) throws Exception {
         initializeRoles();
+        initializeUsers();
     }
 
     private void initializeRoles() {
@@ -36,6 +42,15 @@ public class UserDataInitializer implements CommandLineRunner {
             roleRepository.save(moderatorRole);
 
             System.out.println("✅ Default roles initialized successfully");
+        }
+    }
+    
+    private void initializeUsers() {
+        if (userRepository.count() == 0) {
+            userRepository.save(StaticUsers.ADMIN_USER);
+            userRepository.save(StaticUsers.REGULAR_USER);
+            userRepository.save(StaticUsers.CUSTOMER_USER);
+            System.out.println("✅ Default users initialized successfully");
         }
     }
 }
