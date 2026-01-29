@@ -1,21 +1,29 @@
 package com.ecommerce.user.services;
 
+import com.ecommerce.user.dto.PasswordChangeRequest;
+import com.ecommerce.user.dto.ProfileUpdateRequest;
 import com.ecommerce.user.dto.UserRequest;
 import com.ecommerce.user.dto.UserResponse;
 import com.ecommerce.user.models.User;
 import com.ecommerce.user.models.UserRole;
 import com.ecommerce.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> fetchAllUsers() {
         return userRepository.findAll().stream()
@@ -46,8 +54,9 @@ public class UserService {
     private void updateUserFromRequest(User user, UserRequest userRequest) {
         user.setName(userRequest.getFirstName() + " " + userRequest.getLastName());
         user.setEmail(userRequest.getEmail());
-        // Note: New User model only has name, email, password, enabled, roles, and timestamps
-        // Phone and address fields are not supported in the current User model
+        if (userRequest.getPhone() != null) {
+            user.setPhone(userRequest.getPhone());
+        }
     }
 
     private UserResponse mapToUserResponse(User user) {
@@ -55,18 +64,21 @@ public class UserService {
         response.setId(user.getId());
         
         // Split name into firstName and lastName
-        String[] nameParts = user.getName().split(" ", 2);
+        String name = user.getName() != null ? user.getName() : "";
+        String[] nameParts = name.split(" ", 2);
         response.setFirstName(nameParts[0]);
         response.setLastName(nameParts.length > 1 ? nameParts[1] : "");
         
         response.setEmail(user.getEmail());
-        response.setRole(UserRole.CUSTOMER); // Default role for now
+        response.setPhone(user.getPhone());
+        response.setAvatar(user.getAvatar());
+        response.setRole(UserRole.ROLE_CUSTOMER); // Default role for now
 
         // Set computed fields
-        response.setName(user.getName());
+        response.setName(name);
         response.setIsAdmin(false); // Default for now
         
-        // Note: Address, phone, and avatar fields are not supported in the current User model
+        // Address is now managed separately via AddressController
         response.setAddress(null);
         
         return response;
@@ -79,5 +91,88 @@ public class UserService {
                     userRepository.delete(user);
                     return true;
                 }).orElse(false);
+    }
+    
+    /**
+     * Update user profile
+     */
+    public Optional<UserResponse> updateProfile(String userId, ProfileUpdateRequest request) {
+        log.info("Updating profile for user: {}", userId);
+        
+        return userRepository.findById(userId)
+                .map(user -> {
+                    // Update name if firstName or lastName provided
+                    if (request.getFirstName() != null || request.getLastName() != null) {
+                        String firstName = request.getFirstName() != null ? 
+                            request.getFirstName() : 
+                            (user.getName() != null ? user.getName().split(" ", 2)[0] : "");
+                        String lastName = request.getLastName() != null ? 
+                            request.getLastName() : 
+                            (user.getName() != null && user.getName().split(" ", 2).length > 1 ? 
+                                user.getName().split(" ", 2)[1] : "");
+                        user.setName(firstName + " " + lastName);
+                    }
+                    
+                    // Update email if provided
+                    if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+                        // Check if email is already taken
+                        if (userRepository.existsByEmail(request.getEmail())) {
+                            throw new RuntimeException("Email already in use");
+                        }
+                        user.setEmail(request.getEmail());
+                    }
+                    
+                    // Update phone if provided
+                    if (request.getPhone() != null) {
+                        user.setPhone(request.getPhone());
+                    }
+                    
+                    // Update avatar if provided
+                    if (request.getAvatar() != null) {
+                        user.setAvatar(request.getAvatar());
+                    }
+                    
+                    user.setUpdatedAt(LocalDateTime.now());
+                    User savedUser = userRepository.save(user);
+                    
+                    log.info("Profile updated for user: {}", userId);
+                    return mapToUserResponse(savedUser);
+                });
+    }
+    
+    /**
+     * Change user password
+     */
+    public boolean changePassword(String userId, PasswordChangeRequest request) {
+        log.info("Changing password for user: {}", userId);
+        
+        return userRepository.findById(userId)
+                .map(user -> {
+                    // Verify current password
+                    if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                        log.warn("Current password does not match for user: {}", userId);
+                        throw new RuntimeException("Current password is incorrect");
+                    }
+                    
+                    // Verify new password matches confirmation
+                    if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                        throw new RuntimeException("New password and confirmation do not match");
+                    }
+                    
+                    // Update password
+                    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                    user.setUpdatedAt(LocalDateTime.now());
+                    userRepository.save(user);
+                    
+                    log.info("Password changed for user: {}", userId);
+                    return true;
+                }).orElse(false);
+    }
+    
+    /**
+     * Get user by ID (internal use)
+     */
+    public Optional<User> getUserById(String userId) {
+        return userRepository.findById(userId);
     }
 }

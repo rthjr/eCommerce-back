@@ -43,6 +43,13 @@ public class User {
     @Size(min = 6)
     private String password;
 
+    @Field(name = "phone")
+    @Size(max = 20)
+    private String phone;
+
+    @Field(name = "avatar")
+    private String avatar;
+
     @Field(name = "enabled")
     private Boolean enabled = true;
 
