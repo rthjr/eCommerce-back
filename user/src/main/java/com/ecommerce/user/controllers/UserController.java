@@ -1,9 +1,12 @@
 package com.ecommerce.user.controllers;
 
+import com.ecommerce.user.dto.DeleteAccountRequest;
 import com.ecommerce.user.dto.PasswordChangeRequest;
 import com.ecommerce.user.dto.ProfileUpdateRequest;
+import com.ecommerce.user.dto.UserDataExport;
 import com.ecommerce.user.dto.UserRequest;
 import com.ecommerce.user.dto.UserResponse;
+import com.ecommerce.user.services.AccountService;
 import com.ecommerce.user.services.JwtService;
 import com.ecommerce.user.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final JwtService jwtService;
+	private final AccountService accountService;
 
 	@GetMapping
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
@@ -130,6 +134,60 @@ public class UserController {
 			log.error("Error changing password: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(Map.of("error", "Password change failed", "message", e.getMessage()));
+		}
+	}
+	
+	/**
+	 * Delete current user's account
+	 */
+	@DeleteMapping("/profile")
+	public ResponseEntity<?> deleteAccount(
+			@Valid @RequestBody DeleteAccountRequest request,
+			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+		
+		String userId = extractUserIdFromToken(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("error", "Unauthorized", "message", "Valid authentication token required"));
+		}
+		
+		try {
+			accountService.deleteAccount(userId, request);
+			return ResponseEntity.ok(Map.of(
+					"message", "Account deleted successfully",
+					"success", true
+			));
+		} catch (IllegalArgumentException e) {
+			log.warn("Account deletion failed for user {}: {}", userId, e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", "Account deletion failed", "message", e.getMessage(), "success", false));
+		} catch (Exception e) {
+			log.error("Error deleting account for user {}: {}", userId, e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("error", "Account deletion failed", "message", "An unexpected error occurred", "success", false));
+		}
+	}
+	
+	/**
+	 * Export current user's data (GDPR compliance)
+	 */
+	@GetMapping("/profile/export")
+	public ResponseEntity<?> exportUserData(
+			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+		
+		String userId = extractUserIdFromToken(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("error", "Unauthorized", "message", "Valid authentication token required"));
+		}
+		
+		try {
+			UserDataExport exportData = accountService.exportUserData(userId);
+			return ResponseEntity.ok(exportData);
+		} catch (Exception e) {
+			log.error("Error exporting data for user {}: {}", userId, e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("error", "Data export failed", "message", "Failed to export user data"));
 		}
 	}
 	

@@ -14,12 +14,16 @@ public interface AddressRepository extends MongoRepository<Address, String> {
     
     List<Address> findByUserId(String userId);
     
+    List<Address> findByUserIdOrderByIsDefaultDescCreatedAtDesc(String userId);
+    
     Optional<Address> findByIdAndUserId(String id, String userId);
     
     @Query("{ 'userId': ?0, 'isDefault': true }")
     Optional<Address> findDefaultAddressByUserId(String userId);
     
     void deleteByIdAndUserId(String id, String userId);
+    
+    void deleteByUserId(String userId);
     
     long countByUserId(String userId);
     

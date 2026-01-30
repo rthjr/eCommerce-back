@@ -17,10 +17,12 @@ import com.ecommerce.user.dto.response.JwtResponse;
 import com.ecommerce.user.exception.ResourceNotFoundException;
 import com.ecommerce.user.models.Role;
 import com.ecommerce.user.models.User;
+import com.ecommerce.user.models.UserSession;
 import com.ecommerce.user.repository.RoleRepository;
 import com.ecommerce.user.repository.UserRepository;
 import com.ecommerce.user.security.CustomUserDetailsService.UserPrincipal;
 import com.ecommerce.user.security.jwt.JwtTokenProvider;
+import com.ecommerce.user.services.SessionService.DeviceInfo;
 
 @Service
 public class AuthService {
@@ -42,6 +44,24 @@ public class AuthService {
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+    
+    @Autowired
+    private SessionService sessionService;
+    
+    // ThreadLocal to store current session token
+    private static final ThreadLocal<String> currentSessionToken = new ThreadLocal<>();
+    
+    public static String getCurrentSessionToken() {
+        return currentSessionToken.get();
+    }
+    
+    public static void setCurrentSessionToken(String token) {
+        currentSessionToken.set(token);
+    }
+    
+    public static void clearCurrentSessionToken() {
+        currentSessionToken.remove();
+    }
 
     public JwtResponse register(RegisterRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -82,6 +102,10 @@ public class AuthService {
     }
 
     public JwtResponse login(LoginRequest loginRequest) {
+        return login(loginRequest, null, null);
+    }
+    
+    public JwtResponse login(LoginRequest loginRequest, String userAgent, String ipAddress) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -98,6 +122,22 @@ public class AuthService {
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
         var refreshToken = refreshTokenService.createRefreshToken(userPrincipal.getId());
+        
+        // Create session for tracking
+        String sessionToken = null;
+        if (userAgent != null || ipAddress != null) {
+            DeviceInfo deviceInfo = sessionService.parseUserAgent(userAgent != null ? userAgent : "");
+            UserSession session = sessionService.createSession(
+                    userPrincipal.getId(),
+                    deviceInfo.device(),
+                    deviceInfo.browser(),
+                    deviceInfo.operatingSystem(),
+                    ipAddress != null ? ipAddress : "Unknown",
+                    null // Location would need a geo-IP service
+            );
+            sessionToken = session.getSessionToken();
+            setCurrentSessionToken(sessionToken);
+        }
 
         List<String> roles = userPrincipal.getAuthorities().stream()
                 .map(item -> item.getAuthority())
@@ -110,12 +150,17 @@ public class AuthService {
                 roles
         );
 
-        return new JwtResponse(
+        JwtResponse response = new JwtResponse(
                 accessToken,
                 refreshToken.getToken(),
                 tokenProvider.getAccessTokenExpirationMs() / 1000,
                 userInfo
         );
+        
+        // Include session token in response
+        response.setSessionToken(sessionToken);
+        
+        return response;
     }
 
     public String logout() {

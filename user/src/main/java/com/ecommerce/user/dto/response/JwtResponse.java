@@ -15,6 +15,7 @@ public class JwtResponse {
     private String tokenType = "Bearer";
     private Long expiresIn;
     private UserInfo user;
+    private String sessionToken; // For session management
     
     public JwtResponse(String accessToken, String refreshToken, Long expiresIn, UserInfo user) {
         this.accessToken = accessToken;
