@@ -103,17 +103,19 @@ public class ProductService {
 	    product.setDescription(productRequest.getDescription());
 	    product.setPrice(productRequest.getPrice());
 	    product.setStockQuantity(productRequest.getStockQuantity());
+	    product.setImageUrl(productRequest.getImageUrl());
+	    
 	    
 	    if (productRequest.getActive() != null) {
 	        product.setActive(productRequest.getActive());
 	    }
 
 	    // Handle base64 image
-	    if (productRequest.getImageUrl() != null && productRequest.getImageUrl().startsWith("data:image/")) {
-	        String savedImageUrl = saveBase64Image(productRequest.getImageUrl());
-	        product.getImageUrls().clear();
-	        product.getImageUrls().add(savedImageUrl);
-	    }
+//	    if (productRequest.getImageUrl() != null && productRequest.getImageUrl().startsWith("data:image/")) {
+//	        String savedImageUrl = saveBase64Image(productRequest.getImageUrl());
+//	        product.getImageUrls().clear();
+//	        product.getImageUrls().add(savedImageUrl);
+//	    }
 	}
 
 	private String saveBase64Image(String base64Image) {

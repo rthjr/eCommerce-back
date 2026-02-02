@@ -36,7 +36,7 @@ public class Product {
 	private String sellerId;
 	private String sellerName;
 
-	@Deprecated
+//	@Deprecated
 	private String imageUrl; // Deprecated: use imageUrls instead
 
 	private Boolean active = true;
