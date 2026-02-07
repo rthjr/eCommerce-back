@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/order
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: embarkx
+    password: embarkx
   rabbitmq:
     host: localhost
     port: 5672
@@ -65,3 +65,8 @@ resilience4j:
         failureRateThreshold: 50
         automaticTransitionFromOpenToHalfOpenEnabled: true
         slidingWindowType: count_based
+  retry:
+	instances:
+	  retryBreaker:
+		 maxAttempts: 5
+		 waitDuration: 5s
