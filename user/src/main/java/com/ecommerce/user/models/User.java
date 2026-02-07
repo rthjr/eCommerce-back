@@ -61,4 +61,17 @@ public class User {
 
     @Field(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    // Password reset fields
+    @JsonIgnore
+    @Field(name = "password_reset_code_hash")
+    private String passwordResetCodeHash;
+    
+    @JsonIgnore
+    @Field(name = "password_reset_code_expires_at")
+    private LocalDateTime passwordResetCodeExpiresAt;
+    
+    @JsonIgnore
+    @Field(name = "password_reset_code_sent_at")
+    private LocalDateTime passwordResetCodeSentAt;
 }

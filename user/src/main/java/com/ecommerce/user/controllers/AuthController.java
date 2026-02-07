@@ -10,13 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.user.dto.request.ForgotPasswordRequest;
@@ -24,6 +23,7 @@ import com.ecommerce.user.dto.request.LoginRequest;
 import com.ecommerce.user.dto.request.RefreshTokenRequest;
 import com.ecommerce.user.dto.request.RegisterRequest;
 import com.ecommerce.user.dto.request.ResetPasswordRequest;
+import com.ecommerce.user.dto.request.VerifyResetCodeRequest;
 import com.ecommerce.user.dto.response.JwtResponse;
 import com.ecommerce.user.dto.response.MessageResponse;
 import com.ecommerce.user.dto.response.SessionResponse;
@@ -96,7 +96,7 @@ public class AuthController {
     }
     
     /**
-     * Request password reset - sends email with reset link
+     * Request password reset - sends 6-digit code via email
      */
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
@@ -104,41 +104,49 @@ public class AuthController {
             passwordResetService.processForgotPassword(request);
             // Always return success to prevent email enumeration
             return ResponseEntity.ok(Map.of(
-                "message", "If an account exists with this email, you will receive a password reset link shortly.",
+                "message", "If an account exists with this email, you will receive a 6-digit reset code shortly.",
                 "success", true
             ));
         } catch (Exception e) {
             log.error("Error processing forgot password request: {}", e.getMessage());
             // Still return success to prevent enumeration
             return ResponseEntity.ok(Map.of(
-                "message", "If an account exists with this email, you will receive a password reset link shortly.",
+                "message", "If an account exists with this email, you will receive a 6-digit reset code shortly.",
                 "success", true
             ));
         }
     }
     
     /**
-     * Validate reset token
+     * Verify 6-digit reset code
      */
-    @GetMapping("/validate-reset-token")
-    public ResponseEntity<?> validateResetToken(@RequestParam String token) {
-        boolean isValid = passwordResetService.validateResetToken(token);
-        
-        if (isValid) {
-            return ResponseEntity.ok(Map.of(
-                "valid", true,
-                "message", "Token is valid"
-            ));
-        } else {
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<?> verifyResetCode(@Valid @RequestBody VerifyResetCodeRequest request) {
+        try {
+            boolean isValid = passwordResetService.verifyResetCode(request);
+            
+            if (isValid) {
+                return ResponseEntity.ok(Map.of(
+                    "valid", true,
+                    "message", "Reset code is valid"
+                ));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "valid", false,
+                    "message", "Invalid or expired reset code"
+                ));
+            }
+        } catch (Exception e) {
+            log.error("Error verifying reset code: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                 "valid", false,
-                "message", "Invalid or expired reset token"
+                "message", "Invalid or expired reset code"
             ));
         }
     }
     
     /**
-     * Reset password using token
+     * Reset password using verified 6-digit code
      */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
@@ -154,9 +162,9 @@ public class AuthController {
                 "success", false
             ));
         } catch (com.ecommerce.user.exception.ResourceNotFoundException e) {
-            log.warn("Password reset failed - invalid token: {}", e.getMessage());
+            log.warn("Password reset failed - user not found: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
-                "message", "Invalid or expired reset token",
+                "message", "Invalid reset request",
                 "success", false
             ));
         } catch (Exception e) {

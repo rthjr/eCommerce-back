@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TokenRefreshException.class)
@@ -28,8 +31,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         body.put("error", "Token Refresh Error");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).replace("uri=", ""));
-        
+
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Object> handleEmailSendingException(EmailSendingException ex, WebRequest request) {
+        // Log the full details for debugging
+        log.error("Email sending failed for type: {} to recipient: {}",
+                 ex.getEmailType(),
+                 ex.getRecipientEmail(),
+                 ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        body.put("error", "Email Service Error");
+        body.put("message", "Failed to send email. Please try again later or contact support.");
+        body.put("path", request.getDescription(false).replace("uri=", ""));
+
+        // Don't expose email address or technical details to client
+        return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

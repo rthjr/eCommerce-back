@@ -3,11 +3,21 @@ spring:
     name: user-service
   config:
     import: optional:configserver:http://localhost:8888
-  # Uncomment for MongoDB Atlas
-  # data:
-  #   mongodb:
-  #     uri: mongodb+srv://sovannarithphan9_db_user:4TjhTw5-bQg824p@user-data.unip0bf.mongodb.net/?appName=user-data
-  #     database: userdb
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "sovannarithphan9@gmail.com"
+    password: "wdqugcibbpbrqdkk"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: "*"
+    test-connection: true
   security:
     oauth2:
       client:
@@ -41,10 +51,21 @@ spring:
             user-info-uri: https://graph.facebook.com/me
             user-name-attribute: id
 
+app:
+  email:
+    from: "sovannarithphan9@gmail.com"
+    async-enabled: true
+  password-reset:
+    code-expiry-minutes: 10
+    resend-cooldown-seconds: 60
+  security:
+    pepper: "MySecure-Pepper-Key-2024"
+    expose-email-errors: false
+
 jwt:
   secret: your-256-bit-secret-key-here-at-least-32-characters-long-and-secure
-  access-token-expiration-ms: 900000    # 15 minutes
-  refresh-token-expiration-ms: 2592000000  # 30 days
+  access-token-expiration-ms: 900000
+  refresh-token-expiration-ms: 2592000000
 
 oauth2:
   google:
@@ -62,3 +83,8 @@ oauth2:
     client-secret: ${FACEBOOK_CLIENT_SECRET:your-facebook-client-secret}
     redirect-uri: ${FACEBOOK_REDIRECT_URI:http://localhost:8082/oauth2/callback/facebook}
     api-uri: https://graph.facebook.com/me
+
+logging:
+  level:
+    com.ecommerce.user.services.EmailService: DEBUG
+    org.springframework.mail: DEBUG
