@@ -2,8 +2,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/product
 #    url: jdbc:mysql://localhost:3307/embarkx
-    username: embarkx
-    password: embarkx
+    username: rthjr
+    password: rthjr
   rabbitmq:
     host: localhost
     port: 5672

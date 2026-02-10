@@ -67,6 +67,12 @@ public class Product {
 
 	private String dressStyle;
 
+	// Inventory management fields
+	private Integer lowStockThreshold = 10;
+	private Integer reorderPoint = 5;
+	private Integer reorderQuantity = 50;
+	private String sku; // Stock Keeping Unit
+
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 

@@ -25,4 +25,26 @@ public class ProductReview {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)    
     private Product product;
+    
+    // Seller feedback management fields
+    @Column(columnDefinition = "TEXT")
+    private String sellerResponse;
+    
+    private LocalDateTime sellerResponseDate;
+    
+    private Boolean isFlagged = false;
+    
+    private String flagReason;
+    
+    private LocalDateTime flaggedAt;
+    
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus status = ReviewStatus.PUBLISHED;
+    
+    public enum ReviewStatus {
+        PUBLISHED,
+        HIDDEN,
+        FLAGGED,
+        UNDER_REVIEW
+    }
 }
