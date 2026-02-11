@@ -58,6 +58,10 @@ public class Order {
     private Boolean isDelivered = false;
     private LocalDateTime deliveredAt;
 
+    // Failed Delivery Information
+    private Integer failedDeliveryAttempts = 0;
+    private String failedDeliveryReason;
+
     // Payment Gateway IDs
     private String paypalOrderId;
     private String stripeClientSecret;
