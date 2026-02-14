@@ -15,7 +15,8 @@ public class ProductReview {
     private Long id;
     private Integer rating;
     private String content;
-    private Long userId;
+    private String userId;
+    @Column(name = "user_name")
     private String user;
     @CreationTimestamp
     private LocalDateTime date;

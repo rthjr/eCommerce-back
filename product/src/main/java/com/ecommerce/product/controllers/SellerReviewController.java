@@ -89,4 +89,22 @@ public class SellerReviewController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{reviewId}/hide")
+    public ResponseEntity<SellerReviewResponse> hideReview(
+            @RequestHeader("X-User-Id") String sellerId,
+            @PathVariable Long reviewId) {
+        return reviewService.hideReview(reviewId, sellerId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{reviewId}/publish")
+    public ResponseEntity<SellerReviewResponse> publishReview(
+            @RequestHeader("X-User-Id") String sellerId,
+            @PathVariable Long reviewId) {
+        return reviewService.publishReview(reviewId, sellerId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

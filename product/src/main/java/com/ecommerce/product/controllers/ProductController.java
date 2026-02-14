@@ -122,7 +122,9 @@ public class ProductController {
 	@PostMapping("/{productId}/reviews")
 	public ResponseEntity<ReviewResponse> createReview(@PathVariable Long productId,
 			@RequestBody ReviewRequest reviewRequest) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(productService.createReview(productId, reviewRequest));
+		ProductService.ReviewUpsertResult result = productService.createReview(productId, reviewRequest);
+		HttpStatus status = result.isCreated() ? HttpStatus.CREATED : HttpStatus.OK;
+		return ResponseEntity.status(status).body(result.getReview());
 	}
 
 	@GetMapping("/{productId}/faqs")

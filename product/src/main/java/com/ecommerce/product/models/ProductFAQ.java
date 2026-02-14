@@ -14,6 +14,7 @@ public class ProductFAQ {
 	private String question;
 	private String answer;
 	private Integer orderIndex;
+	private Boolean hidden = false;
 
 	@ManyToOne
 	@JoinColumn(name = "product_id", nullable = false)

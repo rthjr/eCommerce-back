@@ -4,6 +4,7 @@ import com.ecommerce.product.dtos.*;
 import com.ecommerce.product.models.ProductReview;
 import com.ecommerce.product.models.ProductReview.ReviewStatus;
 import com.ecommerce.product.repositories.ProductReviewRepository;
+import com.ecommerce.product.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class SellerReviewService {
 
     private final ProductReviewRepository reviewRepository;
+    private final ProductRepository productRepository;
 
     public Page<SellerReviewResponse> getSellerReviews(String sellerId, int page, int size, String sortBy) {
         Sort sort = switch (sortBy) {
@@ -91,7 +93,33 @@ public class SellerReviewService {
                     review.setFlagReason(reason);
                     review.setFlaggedAt(LocalDateTime.now());
                     review.setStatus(ReviewStatus.FLAGGED);
-                    return mapToSellerResponse(reviewRepository.save(review));
+                    ProductReview saved = reviewRepository.save(review);
+                    updateProductRating(saved.getProduct());
+                    return mapToSellerResponse(saved);
+                });
+    }
+
+    @Transactional
+    public Optional<SellerReviewResponse> hideReview(Long reviewId, String sellerId) {
+        return reviewRepository.findById(reviewId)
+                .filter(review -> review.getProduct().getSellerId().equals(sellerId))
+                .map(review -> {
+                    review.setStatus(ReviewStatus.HIDDEN);
+                    ProductReview saved = reviewRepository.save(review);
+                    updateProductRating(saved.getProduct());
+                    return mapToSellerResponse(saved);
+                });
+    }
+
+    @Transactional
+    public Optional<SellerReviewResponse> publishReview(Long reviewId, String sellerId) {
+        return reviewRepository.findById(reviewId)
+                .filter(review -> review.getProduct().getSellerId().equals(sellerId))
+                .map(review -> {
+                    review.setStatus(ReviewStatus.PUBLISHED);
+                    ProductReview saved = reviewRepository.save(review);
+                    updateProductRating(saved.getProduct());
+                    return mapToSellerResponse(saved);
                 });
     }
 
@@ -140,5 +168,13 @@ public class SellerReviewService {
         response.setFlagReason(review.getFlagReason());
         response.setStatus(review.getStatus());
         return response;
+    }
+
+    private void updateProductRating(com.ecommerce.product.models.Product product) {
+        Long reviewCount = reviewRepository.countByProductIdAndStatus(product.getId(), ReviewStatus.PUBLISHED);
+        Double averageRating = reviewRepository.getAverageRatingByProductIdAndStatus(product.getId(), ReviewStatus.PUBLISHED);
+        product.setNumReviews(reviewCount != null ? reviewCount.intValue() : 0);
+        product.setRating(averageRating != null ? averageRating : 0.0);
+        productRepository.save(product);
     }
 }

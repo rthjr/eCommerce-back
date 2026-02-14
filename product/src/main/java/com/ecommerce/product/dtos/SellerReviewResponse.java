@@ -13,7 +13,7 @@ public class SellerReviewResponse {
     private String productImage;
     private Integer rating;
     private String content;
-    private Long userId;
+    private String userId;
     private String userName;
     private LocalDateTime date;
     private Boolean verifiedPurchase;

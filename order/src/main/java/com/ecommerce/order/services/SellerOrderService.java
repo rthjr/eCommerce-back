@@ -1,9 +1,11 @@
 package com.ecommerce.order.services;
 
+import com.ecommerce.order.clients.ProductServiceClient;
 import com.ecommerce.order.dtos.OrderItemDTO;
 import com.ecommerce.order.dtos.OrderResponse;
-import com.ecommerce.order.dtos.ShippingAddressDTO;
 import com.ecommerce.order.dtos.PaymentResultDTO;
+import com.ecommerce.order.dtos.ProductResponse;
+import com.ecommerce.order.dtos.ShippingAddressDTO;
 import com.ecommerce.order.models.Order;
 import com.ecommerce.order.models.OrderStatus;
 import com.ecommerce.order.repositories.OrderRepository;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class SellerOrderService {
 
     private final OrderRepository orderRepository;
+    private final ProductServiceClient productServiceClient;
 
     // For now, we'll assume all orders are visible to sellers
     // In a real implementation, you'd filter orders based on product seller IDs
@@ -167,20 +170,42 @@ public class SellerOrderService {
     }
 
     private OrderResponse mapToOrderResponse(Order order) {
+        Map<String, ProductResponse> productCache = new HashMap<>();
+        List<OrderItemDTO> items = order.getItems().stream()
+                .map(item -> {
+                    String productName = item.getProductName();
+                    String imageUrl = item.getProductImage();
+                    boolean needsLookup = (productName == null || productName.isBlank())
+                            || (imageUrl == null || imageUrl.isBlank());
+                    ProductResponse product = needsLookup
+                            ? getProductDetailsCached(item.getProductId(), productCache)
+                            : null;
+
+                    if (productName == null || productName.isBlank()) {
+                        productName = product != null ? product.getName() : null;
+                    }
+                    if (imageUrl == null || imageUrl.isBlank()) {
+                        imageUrl = resolveProductImage(product);
+                    }
+
+                    return new OrderItemDTO(
+                            item.getId(),
+                            item.getProductId(),
+                            productName,
+                            imageUrl,
+                            item.getQuantity(),
+                            item.getPrice(),
+                            item.getPrice().multiply(new BigDecimal(item.getQuantity()))
+                    );
+                })
+                .collect(Collectors.toList());
+
         return new OrderResponse(
                 order.getId(),
                 order.getUserId(),
                 order.getTotalAmount(),
                 order.getStatus(),
-                order.getItems().stream()
-                        .map(item -> new OrderItemDTO(
-                                item.getId(),
-                                item.getProductId(),
-                                item.getQuantity(),
-                                item.getPrice(),
-                                item.getPrice().multiply(new BigDecimal(item.getQuantity()))
-                        ))
-                        .collect(Collectors.toList()),
+                items,
                 order.getShippingAddress() != null
                         ? new ShippingAddressDTO(
                                 order.getShippingAddress().getFirstName(),
@@ -214,5 +239,32 @@ public class SellerOrderService {
                 order.getCreatedAt(),
                 order.getUpdatedAt()
         );
+    }
+
+    private ProductResponse getProductDetailsCached(String productId, Map<String, ProductResponse> cache) {
+        if (cache.containsKey(productId)) {
+            return cache.get(productId);
+        }
+        try {
+            ProductResponse product = productServiceClient.getProductDetails(productId);
+            cache.put(productId, product);
+            return product;
+        } catch (Exception e) {
+            cache.put(productId, null);
+            return null;
+        }
+    }
+
+    private String resolveProductImage(ProductResponse product) {
+        if (product == null) {
+            return null;
+        }
+        if (product.getImageUrl() != null && !product.getImageUrl().isBlank()) {
+            return product.getImageUrl();
+        }
+        if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+            return product.getImageUrls().get(0);
+        }
+        return null;
     }
 }

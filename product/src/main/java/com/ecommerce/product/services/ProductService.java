@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -25,12 +26,14 @@ import com.ecommerce.product.dtos.ReviewResponse;
 import com.ecommerce.product.models.Product;
 import com.ecommerce.product.models.ProductFAQ;
 import com.ecommerce.product.models.ProductReview;
+import com.ecommerce.product.models.ProductReview.ReviewStatus;
 import com.ecommerce.product.repositories.ProductFAQRepository;
 import com.ecommerce.product.repositories.ProductRepository;
 import com.ecommerce.product.repositories.ProductReviewRepository;
 import com.ecommerce.product.specifications.ProductSpecification;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -202,32 +205,45 @@ public class ProductService {
 		};
 
 		Pageable pageable = PageRequest.of(page, size, sort);
-		Page<ProductReview> reviews = reviewRepository.findByProductId(productId, pageable);
+		Page<ProductReview> reviews = reviewRepository.findByProductIdAndStatus(productId, ReviewStatus.PUBLISHED, pageable);
 
 		return reviews.map(this::mapToReviewResponse);
 	}
 
-	public ReviewResponse createReview(Long productId, ReviewRequest request) {
-		if (reviewRepository.existsByProductIdAndUserId(productId, request.getUserId())) {
-			throw new RuntimeException("User already reviewed this product");
+	@Transactional
+	public ReviewUpsertResult createReview(Long productId, ReviewRequest request) {
+		if (request.getUserId() == null || request.getUserId().isBlank()) {
+			throw new RuntimeException("User ID is required");
 		}
 
 		Product product = productRepository.findById(productId)
 				.orElseThrow(() -> new RuntimeException("Product not found"));
 
-		ProductReview review = new ProductReview();
+		Optional<ProductReview> existingReview = reviewRepository.findByProductIdAndUserId(productId, request.getUserId());
+		boolean created = existingReview.isEmpty();
+
+		ProductReview review = existingReview.orElseGet(ProductReview::new);
 		review.setProduct(product);
 		review.setRating(request.getRating());
 		review.setContent(request.getContent());
 		review.setUserId(request.getUserId());
 		review.setUser("User " + request.getUserId()); // Simplified user display
+		review.setStatus(ReviewStatus.PUBLISHED);
+		if (!created) {
+			review.setDate(LocalDateTime.now());
+		}
 
 		ProductReview saved = reviewRepository.save(review);
-		return mapToReviewResponse(saved);
+		
+		// Update product rating and review count
+		updateProductRating(product);
+		productRepository.save(product);
+
+		return new ReviewUpsertResult(mapToReviewResponse(saved), created);
 	}
 
 	public List<FAQResponse> getProductFAQs(Long productId) {
-		return faqRepository.findByProductIdOrderByOrderIndexAsc(productId).stream().map(this::mapToFAQResponse)
+		return faqRepository.findByProductIdAndHiddenFalseOrderByOrderIndexAsc(productId).stream().map(this::mapToFAQResponse)
 				.collect(Collectors.toList());
 	}
 
@@ -286,6 +302,31 @@ public class ProductService {
 	            return false; // Insufficient stock
 	        })
 	        .orElse(false); // Product not found
+	}
+
+	private void updateProductRating(Product product) {
+		Long reviewCount = reviewRepository.countByProductIdAndStatus(product.getId(), ReviewStatus.PUBLISHED);
+		Double averageRating = reviewRepository.getAverageRatingByProductIdAndStatus(product.getId(), ReviewStatus.PUBLISHED);
+		product.setNumReviews(reviewCount != null ? reviewCount.intValue() : 0);
+		product.setRating(averageRating != null ? averageRating : 0.0);
+	}
+
+	public static class ReviewUpsertResult {
+		private final ReviewResponse review;
+		private final boolean created;
+
+		public ReviewUpsertResult(ReviewResponse review, boolean created) {
+			this.review = review;
+			this.created = created;
+		}
+
+		public ReviewResponse getReview() {
+			return review;
+		}
+
+		public boolean isCreated() {
+			return created;
+		}
 	}
 
 

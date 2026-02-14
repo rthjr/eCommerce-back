@@ -13,9 +13,22 @@ import java.util.List;
 public interface ProductReviewRepository extends JpaRepository<ProductReview, Long> {
 	Page<ProductReview> findByProductId(Long productId, Pageable pageable);
 
+	Page<ProductReview> findByProductIdAndStatus(Long productId, ReviewStatus status, Pageable pageable);
+
 	Long countByProductId(Long productId);
 
-	boolean existsByProductIdAndUserId(Long productId, Long userId);
+	boolean existsByProductIdAndUserId(Long productId, String userId);
+
+	@Query("SELECT r FROM ProductReview r WHERE r.product.id = :productId AND r.userId = :userId")
+	java.util.Optional<ProductReview> findByProductIdAndUserId(@Param("productId") Long productId, @Param("userId") String userId);
+
+	Long countByProductIdAndStatus(Long productId, ReviewStatus status);
+
+	@Query("SELECT AVG(r.rating) FROM ProductReview r WHERE r.product.id = :productId AND r.status = :status")
+	Double getAverageRatingByProductIdAndStatus(@Param("productId") Long productId, @Param("status") ReviewStatus status);
+
+	@Query("SELECT AVG(r.rating) FROM ProductReview r WHERE r.product.id = :productId")
+	Double getAverageRatingByProductId(@Param("productId") Long productId);
 	
 	// Seller feedback management queries
 	@Query("SELECT r FROM ProductReview r JOIN r.product p WHERE p.sellerId = :sellerId")

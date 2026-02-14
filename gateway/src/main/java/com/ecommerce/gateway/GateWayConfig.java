@@ -24,14 +24,23 @@ public class GateWayConfig {
 
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes().route("product-service", r -> r.path("/api/products/**").filters(f -> f
+		return builder.routes().route("product-service", r -> r.path(
+				"/api/products/**",
+				"/api/sellers/reviews/**",
+				"/api/sellers/faqs/**").filters(f -> f
 				.retry(retryConfig -> retryConfig.setRetries(10).setMethods(HttpMethod.GET))
 				.requestRateLimiter(
 						config -> config.setRateLimiter(redisRateLimiter()).setKeyResolver(hostNameKeyResolver()))
 				.circuitBreaker(config -> config.setName("ecomBreaker").setFallbackUri("forward:/fallback/products")))
 //                        .filters(f -> f.rewritePath("/products(?<segment>/?.*)",
 //                                "/api/products${segment}"))
-				.uri("lb://PRODUCT-SERVICE")).route("user-service", r -> r.path("/api/users/**")
+				.uri("lb://PRODUCT-SERVICE"))
+				.route("user-service", r -> r.path(
+						"/api/users/**",
+						"/api/auth/**",
+						"/api/oauth2/**",
+						"/api/loyalty/**",
+						"/api/trust-score/**")
 //                        .filters(f -> f.rewritePath("/users(?<segment>/?.*)",
 //                                "/api/users${segment}"))
 						.uri("lb://USER-SERVICE"))

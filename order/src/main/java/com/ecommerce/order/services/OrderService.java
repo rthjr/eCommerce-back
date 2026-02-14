@@ -1,19 +1,24 @@
 package com.ecommerce.order.services;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.order.clients.ProductServiceClient;
+import com.ecommerce.order.dtos.CreateOrderRequest;
 import com.ecommerce.order.dtos.OrderItemDTO;
 import com.ecommerce.order.dtos.OrderResponse;
 import com.ecommerce.order.dtos.ProductResponse;
+import com.ecommerce.order.dtos.ShippingAddressDTO;
 import com.ecommerce.order.models.CartItem;
 import com.ecommerce.order.models.Order;
 import com.ecommerce.order.models.OrderItem;
 import com.ecommerce.order.models.OrderStatus;
+import com.ecommerce.order.models.ShippingAddress;
 import com.ecommerce.order.repositories.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +30,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final ProductServiceClient productServiceClient;
 
-	public Optional<OrderResponse> createOrder(String userId) {
+	public Optional<OrderResponse> createOrder(String userId, CreateOrderRequest request) {
 		List<CartItem> cartItems = cartService.getCart(userId);
 		if (cartItems.isEmpty()) {
 			return Optional.empty();
@@ -54,9 +59,26 @@ public class OrderService {
 		order.setUserId(userId);
 		order.setStatus(OrderStatus.CONFIRMED);
 		order.setTotalAmount(totalPrice);
+		if (request != null) {
+			if (request.getShippingAddress() != null) {
+				order.setShippingAddress(mapToShippingAddress(request.getShippingAddress()));
+			}
+			if (request.getPaymentMethod() != null) {
+				order.setPaymentMethod(request.getPaymentMethod());
+			}
+		}
 
 		List<OrderItem> orderItems = cartItems.stream()
-				.map(item -> new OrderItem(null, item.getProductId(), item.getQuantity(), item.getPrice(), order))
+				.map(item -> {
+					OrderItem orderItem = new OrderItem();
+					orderItem.setOrder(order);
+					orderItem.setProductId(item.getProductId());
+					orderItem.setProductName(item.getProductName());
+					orderItem.setProductImage(item.getProductImage());
+					orderItem.setQuantity(item.getQuantity());
+					orderItem.setPrice(item.getPrice());
+					return orderItem;
+				})
 				.collect(java.util.stream.Collectors.toList());
 
 		order.setItems(orderItems);
@@ -69,11 +91,31 @@ public class OrderService {
 	}
 
 	private OrderResponse mapToOrderResponse(Order order) {
-		return new OrderResponse(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), order
-				.getItems().stream()
-				.map(orderItem -> new OrderItemDTO(orderItem.getId(), orderItem.getProductId(), orderItem.getQuantity(),
-						orderItem.getPrice(), orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity()))))
-				.toList(),
+		Map<String, ProductResponse> productCache = new HashMap<>();
+		List<OrderItemDTO> items = order.getItems().stream()
+				.map(orderItem -> {
+					String productName = orderItem.getProductName();
+					String imageUrl = orderItem.getProductImage();
+					boolean needsLookup = (productName == null || productName.isBlank())
+							|| (imageUrl == null || imageUrl.isBlank());
+					ProductResponse product = needsLookup
+							? getProductDetailsCached(orderItem.getProductId(), productCache)
+							: null;
+
+					if (productName == null || productName.isBlank()) {
+						productName = product != null ? product.getName() : null;
+					}
+					if (imageUrl == null || imageUrl.isBlank()) {
+						imageUrl = resolveProductImage(product);
+					}
+
+					return new OrderItemDTO(orderItem.getId(), orderItem.getProductId(), productName, imageUrl,
+							orderItem.getQuantity(), orderItem.getPrice(),
+							orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity())));
+				})
+				.toList();
+
+		return new OrderResponse(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), items,
 				order.getShippingAddress() != null ? mapToShippingAddressDTO(order.getShippingAddress()) : null,
 				order.getPaymentMethod(),
 				order.getPaymentResult() != null ? mapToPaymentResultDTO(order.getPaymentResult()) : null,
@@ -82,11 +124,46 @@ public class OrderService {
 				order.getStripeClientSecret(), order.getCreatedAt(), order.getUpdatedAt());
 	}
 
+	private ProductResponse getProductDetailsCached(String productId, Map<String, ProductResponse> cache) {
+		if (cache.containsKey(productId)) {
+			return cache.get(productId);
+		}
+		try {
+			ProductResponse product = productServiceClient.getProductDetails(productId);
+			cache.put(productId, product);
+			return product;
+		} catch (Exception e) {
+			cache.put(productId, null);
+			return null;
+		}
+	}
+
+	private String resolveProductImage(ProductResponse product) {
+		if (product == null) {
+			return null;
+		}
+		if (product.getImageUrl() != null && !product.getImageUrl().isBlank()) {
+			return product.getImageUrl();
+		}
+		if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+			return product.getImageUrls().get(0);
+		}
+		return null;
+	}
+
 	private com.ecommerce.order.dtos.ShippingAddressDTO mapToShippingAddressDTO(
 			com.ecommerce.order.models.ShippingAddress address) {
 		return new com.ecommerce.order.dtos.ShippingAddressDTO(address.getFirstName(), address.getLastName(),
 				address.getStreet(), address.getCity(), address.getState(), address.getZipCode(), address.getCountry(),
 				address.getPhone());
+	}
+
+	private ShippingAddress mapToShippingAddress(ShippingAddressDTO address) {
+		if (address == null) {
+			return null;
+		}
+		return new ShippingAddress(address.getFirstName(), address.getLastName(), address.getStreet(),
+				address.getCity(), address.getState(), address.getZipCode(), address.getCountry(), address.getPhone());
 	}
 
 	private com.ecommerce.order.dtos.PaymentResultDTO mapToPaymentResultDTO(

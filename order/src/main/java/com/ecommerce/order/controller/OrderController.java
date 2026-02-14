@@ -1,5 +1,6 @@
 package com.ecommerce.order.controller;
 
+import com.ecommerce.order.dtos.CreateOrderRequest;
 import com.ecommerce.order.dtos.OrderResponse;
 import com.ecommerce.order.dtos.PaymentResultDTO;
 import com.ecommerce.order.services.OrderService;
@@ -18,8 +19,9 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
-            @RequestHeader("X-User-ID") String userId) {
-        return orderService.createOrder(userId)
+            @RequestHeader("X-User-ID") String userId,
+            @RequestBody(required = false) CreateOrderRequest request) {
+        return orderService.createOrder(userId, request)
                 .map(orderResponse -> new ResponseEntity<>(orderResponse, HttpStatus.CREATED))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
