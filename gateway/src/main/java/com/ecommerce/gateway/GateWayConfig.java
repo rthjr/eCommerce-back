@@ -10,7 +10,7 @@ import org.springframework.http.HttpMethod;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class GatewayConfig {
+public class GateWayConfig {
 
 	@Bean
 	public RedisRateLimiter redisRateLimiter() {

@@ -31,6 +31,6 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
             @Param("start") LocalDateTime start, 
             @Param("end") LocalDateTime end);
     
-    @Query("SELECT SUM(sm.quantity) FROM stock_movements sm WHERE sm.productId = :productId AND sm.type = :type")
+    @Query("SELECT SUM(sm.quantity) FROM stock_movements sm WHERE sm.product.id = :productId AND sm.type = :type")
     Long sumQuantityByProductIdAndType(@Param("productId") Long productId, @Param("type") MovementType type);
 }

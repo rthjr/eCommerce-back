@@ -18,8 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(String userId);
     
     // Seller order queries - orders containing products from a specific seller
-    @Query("SELECT DISTINCT o FROM orders o JOIN o.items i WHERE i.productId IN " +
-           "(SELECT p.id FROM com.ecommerce.order.models.OrderItem p WHERE p.order = o)")
+    @Query("SELECT DISTINCT o FROM orders o JOIN FETCH o.items i")
     List<Order> findAllOrdersWithItems();
     
     List<Order> findByStatus(OrderStatus status);
