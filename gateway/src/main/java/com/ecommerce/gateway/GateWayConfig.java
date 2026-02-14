@@ -4,23 +4,24 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 
 @Configuration
-public class GateWayConfig {
+public class GatewayConfig {
 
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes().route("product-service", r -> r.path("/api/products/**")
+		return builder.routes()
+				.route("product-service", r -> r.path("/api/products/**").filters(f -> f
+						.retry(retryConfig -> retryConfig.setRetries(10).setMethods(HttpMethod.GET)).circuitBreaker(
+								config -> config.setName("ecomBreaker").setFallbackUri("forward:/fallback/products")))
 //                        .filters(f -> f.rewritePath("/products(?<segment>/?.*)",
 //                                "/api/products${segment}"))
-				.filters(f -> f.circuitBreaker(
-						config -> config.setName("ecomBreaker").setFallbackUri("forward:/fallback/products")))
-				.uri("lb://PRODUCT-SERVICE")).route("user-service", r -> r.path("/api/users/**")
+						.uri("lb://PRODUCT-SERVICE"))
+				.route("user-service", r -> r.path("/api/users/**")
 //                        .filters(f -> f.rewritePath("/users(?<segment>/?.*)",
 //                                "/api/users${segment}"))
 						.uri("lb://USER-SERVICE"))
-				.route("auth-service", r -> r.path("/api/auth/**").uri("lb://USER-SERVICE"))
-				.route("oauth2-service", r -> r.path("/api/oauth2/**").uri("lb://USER-SERVICE"))
 				.route("order-service", r -> r.path("/api/orders/**", "/api/cart/**")
 //                        .filters(f -> f.rewritePath("/(?<segment>.*)",
 //                                "/api/${segment}"))

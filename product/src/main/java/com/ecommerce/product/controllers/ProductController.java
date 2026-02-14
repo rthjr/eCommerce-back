@@ -51,6 +51,15 @@ public class ProductController {
 		return ResponseEntity.ok(productService.getAllProducts());
 	}
 
+	@GetMapping("/simulate")
+	public ResponseEntity<String> simulateFailure(@RequestParam(defaultValue = "false") boolean fail){
+		if(fail) {
+			throw new RuntimeException("Simulate Failure For Testing");
+		}
+		
+		return ResponseEntity.ok("Product Service is Ok");
+	}
+	
 	@GetMapping("/owner")
 	public ResponseEntity<List<ProductResponse>> getOwnerProducts(
 			@RequestHeader(value = "X-User-Id", required = true) String sellerId) {
