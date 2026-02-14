@@ -70,3 +70,9 @@ resilience4j:
       retryBreaker:
         maxAttempts: 5
         waitDuration: 5s
+  rateLimiter:
+    instances:
+      rateBreaker:
+        timeout-duration: 0
+        limit-refresh-period: 4s
+        limit-for-period: 2
