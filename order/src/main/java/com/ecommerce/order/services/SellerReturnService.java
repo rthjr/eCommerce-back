@@ -4,15 +4,19 @@ import com.ecommerce.order.dto.ApproveReturnRequestDTO;
 import com.ecommerce.order.dto.RejectReturnRequestDTO;
 import com.ecommerce.order.dto.ReturnRequestDTO;
 import com.ecommerce.order.dto.SellerReturnStatsDTO;
+import com.ecommerce.order.dtos.RefundDTO;
 import com.ecommerce.order.models.ReturnRequest;
+import com.ecommerce.order.models.RefundMethod;
 import com.ecommerce.order.models.ReturnStatus;
 import com.ecommerce.order.repositories.RefundRepository;
 import com.ecommerce.order.repositories.ReturnRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +31,7 @@ public class SellerReturnService {
 
     private final ReturnRequestRepository returnRequestRepository;
     private final RefundRepository refundRepository;
+    private final ReturnRefundService returnRefundService;
 
     /**
      * Get return requests for seller's products
@@ -163,6 +168,27 @@ public class SellerReturnService {
                 .totalRefundAmount(totalRefundAmount != null ? totalRefundAmount : 0.0)
                 .averageRefundAmount(averageRefundAmount)
                 .build();
+    }
+
+    /**
+     * Process a refund for an approved return request (seller-scoped)
+     */
+    @Transactional
+    public RefundDTO processRefund(String sellerId, Long returnId, RefundMethod method) {
+        ReturnRequest returnRequest = returnRequestRepository.findById(returnId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Return request not found"));
+
+        if (!sellerId.equals(returnRequest.getSellerId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized: This return request is not for your product");
+        }
+
+        if (returnRequest.getStatus() != ReturnStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Return request cannot be refunded in current status: " + returnRequest.getStatus());
+        }
+
+        return returnRefundService.processRefund(returnId, method)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to process refund"));
     }
 
     /**

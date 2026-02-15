@@ -4,12 +4,15 @@ import com.ecommerce.order.dto.ApproveReturnRequestDTO;
 import com.ecommerce.order.dto.RejectReturnRequestDTO;
 import com.ecommerce.order.dto.ReturnRequestDTO;
 import com.ecommerce.order.dto.SellerReturnStatsDTO;
+import com.ecommerce.order.dtos.ProcessRefundDTO;
+import com.ecommerce.order.dtos.RefundDTO;
 import com.ecommerce.order.services.SellerReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -95,6 +98,24 @@ public class SellerReturnController {
 
         ReturnRequestDTO updatedReturn = sellerReturnService.rejectReturnRequest(sellerId, returnId, rejectDTO);
         return ResponseEntity.ok(updatedReturn);
+    }
+
+    /**
+     * Process refund for an approved return request (seller-scoped)
+     *
+     * @param sellerId The seller's user ID
+     * @param returnId The return request ID
+     * @param request Refund processing details
+     * @return Refund details
+     */
+    @PostMapping("/{returnId}/refund")
+    public ResponseEntity<RefundDTO> processRefund(
+            @RequestHeader("X-User-ID") String sellerId,
+            @PathVariable Long returnId,
+            @RequestBody ProcessRefundDTO request) {
+
+        RefundDTO refund = sellerReturnService.processRefund(sellerId, returnId, request.getMethod());
+        return new ResponseEntity<>(refund, HttpStatus.CREATED);
     }
 
     /**

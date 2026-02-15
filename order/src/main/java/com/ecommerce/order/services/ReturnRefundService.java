@@ -1,6 +1,7 @@
 package com.ecommerce.order.services;
 
-import com.ecommerce.order.dtos.CreateReturnRequestDTO;
+import com.ecommerce.order.clients.ProductServiceClient;
+import com.ecommerce.order.dtos.ProductResponse;
 import com.ecommerce.order.dtos.RefundDTO;
 import com.ecommerce.order.dtos.ReturnRequestDTO;
 import com.ecommerce.order.models.*;
@@ -8,6 +9,7 @@ import com.ecommerce.order.repositories.OrderRepository;
 import com.ecommerce.order.repositories.RefundRepository;
 import com.ecommerce.order.repositories.ReturnRequestRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,21 +22,45 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReturnRefundService {
     private final ReturnRequestRepository returnRequestRepository;
     private final RefundRepository refundRepository;
     private final OrderRepository orderRepository;
+    private final ProductServiceClient productServiceClient;
 
     @Transactional
     public Optional<ReturnRequestDTO> createReturnRequest(String userId, Long orderId, String productId, String reason, java.util.List<String> photos) {
         // Verify order exists and belongs to user
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) {
+            log.warn("createReturnRequest rejected: order not found (orderId={}, userId={}, productId={})", orderId, userId, productId);
             return Optional.empty();
         }
 
         Order order = orderOpt.get();
         if (!order.getUserId().equals(userId)) {
+            log.warn(
+                    "createReturnRequest rejected: order ownership mismatch (orderId={}, orderUserId={}, headerUserId={}, productId={})",
+                    orderId,
+                    order.getUserId(),
+                    userId,
+                    productId
+            );
+            return Optional.empty();
+        }
+
+        // Only allow returns for delivered orders
+        boolean isDelivered = Boolean.TRUE.equals(order.getIsDelivered()) || order.getStatus() == OrderStatus.DELIVERED;
+        if (!isDelivered) {
+            log.warn(
+                    "createReturnRequest rejected: order not delivered (orderId={}, status={}, isDelivered={}, userId={}, productId={})",
+                    orderId,
+                    order.getStatus(),
+                    order.getIsDelivered(),
+                    userId,
+                    productId
+            );
             return Optional.empty();
         }
 
@@ -42,7 +68,24 @@ public class ReturnRefundService {
         boolean productExists = order.getItems().stream()
                 .anyMatch(item -> item.getProductId().equals(productId));
         if (!productExists) {
+            log.warn(
+                    "createReturnRequest rejected: product not in order (orderId={}, userId={}, requestedProductId={}, orderProductIds={})",
+                    orderId,
+                    userId,
+                    productId,
+                    order.getItems().stream().map(OrderItem::getProductId).distinct().toList()
+            );
             return Optional.empty();
+        }
+
+        // Resolve sellerId from product service so seller can manage this return when available.
+        // Some products may be created without seller metadata; in that case we still allow the return request
+        // but seller-scoped return management will not be able to pick it up.
+        ProductResponse product = null;
+        try {
+            product = productServiceClient.getProductDetails(productId);
+        } catch (Exception e) {
+            // Best-effort only
         }
 
         // Create return request
@@ -50,6 +93,9 @@ public class ReturnRefundService {
         returnRequest.setOrderId(orderId);
         returnRequest.setProductId(productId);
         returnRequest.setUserId(userId);
+        if (product != null && product.getSellerId() != null && !product.getSellerId().isBlank()) {
+            returnRequest.setSellerId(product.getSellerId());
+        }
         returnRequest.setReason(reason);
         returnRequest.setPhotos(photos != null ? photos : new java.util.ArrayList<>());
         returnRequest.setStatus(ReturnStatus.PENDING);
@@ -58,7 +104,11 @@ public class ReturnRefundService {
         BigDecimal refundAmount = order.getItems().stream()
                 .filter(item -> item.getProductId().equals(productId))
                 .findFirst()
-                .map(OrderItem::getPrice)
+                .map(item -> {
+                    BigDecimal unitPrice = item.getPrice() != null ? item.getPrice() : BigDecimal.ZERO;
+                    int quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+                    return unitPrice.multiply(BigDecimal.valueOf(quantity));
+                })
                 .orElse(BigDecimal.ZERO);
         returnRequest.setRefundAmount(refundAmount);
 
@@ -137,6 +187,7 @@ public class ReturnRefundService {
         Refund refund = new Refund();
         refund.setOrderId(returnRequest.getOrderId());
         refund.setReturnRequestId(returnRequestId);
+        refund.setSellerId(returnRequest.getSellerId());
         refund.setAmount(returnRequest.getRefundAmount());
         refund.setMethod(method != null ? method : RefundMethod.ORIGINAL);
         refund.setStatus(RefundStatus.PROCESSING);

@@ -35,7 +35,7 @@ public class ReturnRequest {
 
     @ElementCollection
     @CollectionTable(name = "return_photos", joinColumns = @JoinColumn(name = "return_request_id"))
-    @Column(name = "photo_url")
+    @Column(name = "photo_url", columnDefinition = "TEXT")
     private List<String> photos = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

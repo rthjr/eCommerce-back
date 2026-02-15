@@ -26,6 +26,8 @@ public class GateWayConfig {
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes().route("product-service", r -> r.path(
 				"/api/products/**",
+				"/api/campaigns/**",
+				"/api/inventory/**",
 				"/api/sellers/reviews/**",
 				"/api/sellers/faqs/**").filters(f -> f
 				.retry(retryConfig -> retryConfig.setRetries(10).setMethods(HttpMethod.GET))
@@ -44,7 +46,15 @@ public class GateWayConfig {
 //                        .filters(f -> f.rewritePath("/users(?<segment>/?.*)",
 //                                "/api/users${segment}"))
 						.uri("lb://USER-SERVICE"))
-				.route("order-service", r -> r.path("/api/orders/**", "/api/cart/**")
+				.route("order-service", r -> r.path(
+						"/api/orders/**",
+						"/api/cart/**",
+						"/api/returns",
+						"/api/returns/**",
+						"/api/sellers/orders/**",
+						"/api/sellers/financials/**",
+						"/api/my-products/returns",
+						"/api/my-products/returns/**")
 //                        .filters(f -> f.rewritePath("/(?<segment>.*)",
 //                                "/api/${segment}"))
 						.uri("lb://ORDER-SERVICE"))
