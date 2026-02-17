@@ -27,30 +27,30 @@ public class OrderDataInitializer {
                 List<Order> orders = Arrays.asList(
 
                         // Order 1: Completed (Paid + Delivered)
-                        createCompletedOrder("user-001", "Jane", "Doe", "jane.doe@example.com",
+                        createCompletedOrder("demo-customer-001", "Jane", "Doe", "jane.doe@example.com",
                                 "456 Customer Ave", "Los Angeles", "CA", "90001", "USA", "555-0101",
                                 new BigDecimal("149.97"), new BigDecimal("10.00"), BigDecimal.ZERO,
                                 "pay_abc123", 5),
 
                         // Order 2: Paid but not delivered
-                        createPaidOrder("user-002", "Bob", "Smith", "bob.smith@example.com",
+                        createPaidOrder("demo-customer-001", "Bob", "Smith", "bob.smith@example.com",
                                 "789 Buyer Blvd", "Chicago", "IL", "60601", "USA", "555-0102",
                                 new BigDecimal("89.99"), new BigDecimal("6.30"), BigDecimal.ZERO,
                                 "pay_def456", 3),
 
                         // Order 3: Unpaid order
-                        createUnpaidOrder("user-003", "Alice", "Johnson", "alice.johnson@example.com",
+                        createUnpaidOrder("demo-customer-001", "Alice", "Johnson", "alice.johnson@example.com",
                                 "321 Shopper Lane", "Houston", "TX", "77001", "USA", "555-0103",
                                 new BigDecimal("59.99"), new BigDecimal("4.20"), new BigDecimal("5.00"), 2),
 
-                        // Order 4: Another completed order for user-001
-                        createCompletedOrder("user-001", "Jane", "Doe", "jane.doe@example.com",
+                        // Order 4: Another completed order for demo customer
+                        createCompletedOrder("demo-customer-001", "Jane", "Doe", "jane.doe@example.com",
                                 "456 Customer Ave", "Los Angeles", "CA", "90001", "USA", "555-0101",
                                 new BigDecimal("79.99"), new BigDecimal("5.60"), BigDecimal.ZERO,
                                 "pay_ghi789", 10),
 
-                        // Order 5: Paid order for user-002
-                        createPaidOrder("user-002", "Bob", "Smith", "bob.smith@example.com",
+                        // Order 5: Paid order for demo customer
+                        createPaidOrder("demo-customer-001", "Bob", "Smith", "bob.smith@example.com",
                                 "789 Buyer Blvd", "Chicago", "IL", "60601", "USA", "555-0102",
                                 new BigDecimal("199.98"), new BigDecimal("14.00"), BigDecimal.ZERO,
                                 "pay_jkl012", 7));

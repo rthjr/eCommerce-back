@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProcessRefundDTO {
     private RefundMethod method;
+    private Integer delayMinutes;
 }

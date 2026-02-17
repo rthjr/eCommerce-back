@@ -174,7 +174,7 @@ public class SellerReturnService {
      * Process a refund for an approved return request (seller-scoped)
      */
     @Transactional
-    public RefundDTO processRefund(String sellerId, Long returnId, RefundMethod method) {
+    public RefundDTO processRefund(String sellerId, Long returnId, RefundMethod method, Integer delayMinutes) {
         ReturnRequest returnRequest = returnRequestRepository.findById(returnId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Return request not found"));
 
@@ -187,7 +187,7 @@ public class SellerReturnService {
                     "Return request cannot be refunded in current status: " + returnRequest.getStatus());
         }
 
-        return returnRefundService.processRefund(returnId, method)
+        return returnRefundService.processRefund(returnId, method, delayMinutes, false)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to process refund"));
     }
 

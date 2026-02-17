@@ -20,5 +20,8 @@ public class RefundDTO {
     private RefundMethod method;
     private RefundStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime scheduledAt;
     private LocalDateTime processedAt;
+    private String gatewayReference;
+    private String failureReason;
 }

@@ -37,6 +37,15 @@ public class Refund {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
+
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
+
+    @Column(name = "gateway_reference")
+    private String gatewayReference;
+
+    @Column(name = "failure_reason", length = 1000)
+    private String failureReason;
 }

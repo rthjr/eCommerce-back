@@ -12,6 +12,7 @@ import java.util.List;
 public class CreateReturnRequestDTO {
     private Long orderId;
     private String productId;
+    private String sellerId;
     private String reason;
     private List<String> photos;
 }

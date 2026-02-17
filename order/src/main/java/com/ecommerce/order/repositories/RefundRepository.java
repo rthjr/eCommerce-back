@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,11 @@ public interface RefundRepository extends JpaRepository<Refund, Long> {
     List<Refund> findByOrderId(Long orderId);
     Optional<Refund> findByReturnRequestId(Long returnRequestId);
     List<Refund> findByStatus(RefundStatus status);
+    List<Refund> findByStatusAndScheduledAtLessThanEqual(RefundStatus status, LocalDateTime scheduledAt);
 
     @Query("SELECT COALESCE(SUM(r.amount), 0.0) FROM refunds r WHERE r.sellerId = :sellerId AND r.status = 'COMPLETED'")
     Double sumAmountBySellerId(@Param("sellerId") String sellerId);
+
+    @Query("SELECT COALESCE(SUM(r.amount), 0.0) FROM refunds r WHERE r.status = 'COMPLETED'")
+    Double sumCompletedAmountAll();
 }

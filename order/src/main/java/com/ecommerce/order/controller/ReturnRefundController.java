@@ -1,5 +1,6 @@
 package com.ecommerce.order.controller;
 
+import com.ecommerce.order.dto.SellerReturnStatsDTO;
 import com.ecommerce.order.dtos.*;
 import com.ecommerce.order.services.ReturnRefundService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class ReturnRefundController {
                         userId,
                         request.getOrderId(),
                         request.getProductId(),
+                        request.getSellerId(),
                         request.getReason(),
                         request.getPhotos()
                 )
@@ -36,6 +41,29 @@ public class ReturnRefundController {
             @RequestParam(defaultValue = "10") int size) {
         Page<ReturnRequestDTO> returnRequests = returnRefundService.getReturnRequests(userId, page, size);
         return ResponseEntity.ok(returnRequests);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<Page<ReturnRequestDTO>> getAdminReturnRequests(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ReturnRequestDTO> returnRequests = returnRefundService.getAllReturnRequests(status, page, size);
+        return ResponseEntity.ok(returnRequests);
+    }
+
+    @GetMapping("/admin/stats")
+    public ResponseEntity<SellerReturnStatsDTO> getAdminReturnStats() {
+        return ResponseEntity.ok(returnRefundService.getGlobalReturnStats());
+    }
+
+    /**
+     * Temporary recovery endpoint for backfilling seller IDs on legacy return rows.
+     */
+    @PostMapping("/admin/backfill-seller-ids")
+    public ResponseEntity<Map<String, Long>> backfillMissingSellerIds() {
+        return ResponseEntity.ok(returnRefundService.backfillMissingSellerIds());
     }
 
     @PutMapping("/{id}/approve")
@@ -61,9 +89,22 @@ public class ReturnRefundController {
     @PostMapping("/{id}/refund")
     public ResponseEntity<RefundDTO> processRefund(
             @PathVariable Long id,
+            @RequestHeader(value = "X-User-Roles", required = false) String userRolesHeader,
             @RequestBody ProcessRefundDTO request) {
-        return returnRefundService.processRefund(id, request.getMethod())
+        boolean isAdmin = hasRole(userRolesHeader, "ROLE_ADMIN");
+        return returnRefundService.processRefund(id, request.getMethod(), request.getDelayMinutes(), isAdmin)
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.CREATED))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    private boolean hasRole(String userRolesHeader, String expectedRole) {
+        if (userRolesHeader == null || userRolesHeader.isBlank()) {
+            return false;
+        }
+
+        return Arrays.stream(userRolesHeader.split("[,\\s]+"))
+                .map(String::trim)
+                .filter(role -> !role.isBlank())
+                .anyMatch(role -> role.equalsIgnoreCase(expectedRole));
     }
 }

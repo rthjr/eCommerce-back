@@ -14,7 +14,11 @@ public interface ReturnRequestRepository extends JpaRepository<ReturnRequest, Lo
     List<ReturnRequest> findByUserId(String userId);
     List<ReturnRequest> findByOrderId(Long orderId);
     Page<ReturnRequest> findByStatus(ReturnStatus status, Pageable pageable);
+    Page<ReturnRequest> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<ReturnRequest> findByStatusOrderByCreatedAtDesc(ReturnStatus status, Pageable pageable);
     Page<ReturnRequest> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
+    List<ReturnRequest> findBySellerIdIsNull();
+    Long countByStatus(ReturnStatus status);
 
     // Seller-scoped queries
     Page<ReturnRequest> findBySellerIdOrderByCreatedAtDesc(String sellerId, Pageable pageable);

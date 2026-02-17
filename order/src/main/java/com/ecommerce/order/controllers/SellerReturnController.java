@@ -114,7 +114,12 @@ public class SellerReturnController {
             @PathVariable Long returnId,
             @RequestBody ProcessRefundDTO request) {
 
-        RefundDTO refund = sellerReturnService.processRefund(sellerId, returnId, request.getMethod());
+        RefundDTO refund = sellerReturnService.processRefund(
+                sellerId,
+                returnId,
+                request.getMethod(),
+                request.getDelayMinutes()
+        );
         return new ResponseEntity<>(refund, HttpStatus.CREATED);
     }
 

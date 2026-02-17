@@ -36,6 +36,15 @@ management:
 app:
   message: "Hello Order!"
 
+payment:
+  gateway:
+    base-url: ${PAYMENT_GATEWAY_BASE_URL:http://localhost:8976}
+    internal-api-key: ${PAYMENT_GATEWAY_INTERNAL_API_KEY:change-me-in-env}
+
+refund:
+  scheduler:
+    fixed-delay-ms: ${REFUND_SCHEDULER_DELAY_MS:60000}
+
 eureka:
   client:
     serviceUrl:
