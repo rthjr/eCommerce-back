@@ -8,6 +8,7 @@ import com.ecommerce.order.dtos.ProductResponse;
 import com.ecommerce.order.dtos.ShippingAddressDTO;
 import com.ecommerce.order.models.Order;
 import com.ecommerce.order.models.OrderStatus;
+import com.ecommerce.order.models.PaymentResult;
 import com.ecommerce.order.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -161,6 +162,38 @@ public class SellerOrderService {
         return orderRepository.findById(orderId).map(this::mapToOrderResponse);
     }
 
+    @Transactional
+    public Optional<OrderResponse> markOrderAsPaidBySeller(String sellerId, Long orderId) {
+        return orderRepository.findById(orderId).map(order -> {
+            if (Boolean.TRUE.equals(order.getIsPaid())) {
+                return mapToOrderResponse(order);
+            }
+
+            if (!isCashOrPhysicalPaymentMethod(order.getPaymentMethod())) {
+                throw new IllegalArgumentException(
+                        "Only cash/physical payment orders can be marked as paid by seller"
+                );
+            }
+
+            order.setIsPaid(true);
+            order.setPaidAt(LocalDateTime.now());
+
+            PaymentResult paymentResult = order.getPaymentResult();
+            if (paymentResult == null) {
+                paymentResult = new PaymentResult();
+            }
+
+            if (paymentResult.getPaymentId() == null || paymentResult.getPaymentId().isBlank()) {
+                paymentResult.setPaymentId("CASH-" + order.getId() + "-" + System.currentTimeMillis());
+            }
+            paymentResult.setStatus("SUCCESS");
+            paymentResult.setUpdateTime(LocalDateTime.now().toString());
+            order.setPaymentResult(paymentResult);
+
+            return mapToOrderResponse(orderRepository.save(order));
+        });
+    }
+
     public List<OrderResponse> getRecentOrders(String sellerId, int days) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(days);
         return orderRepository.findByDateRange(startDate, LocalDateTime.now())
@@ -266,5 +299,21 @@ public class SellerOrderService {
             return product.getImageUrls().get(0);
         }
         return null;
+    }
+
+    private boolean isCashOrPhysicalPaymentMethod(String paymentMethod) {
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            return false;
+        }
+        String normalized = paymentMethod.trim().toUpperCase(Locale.ROOT);
+        return normalized.equals("CASH")
+                || normalized.equals("COD")
+                || normalized.equals("CASH_ON_DELIVERY")
+                || normalized.equals("PAY_ON_DELIVERY")
+                || normalized.equals("PHYSICAL")
+                || normalized.equals("OFFLINE")
+                || normalized.contains("CASH")
+                || normalized.contains("DELIVERY")
+                || normalized.contains("PHYSICAL");
     }
 }

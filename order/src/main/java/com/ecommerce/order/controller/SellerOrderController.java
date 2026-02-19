@@ -95,6 +95,20 @@ public class SellerOrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Mark cash/physical order as paid (seller confirmation after receiving money)
+    @PutMapping("/{id}/payment/mark-paid")
+    public ResponseEntity<?> markOrderAsPaid(
+            @RequestHeader("X-User-Id") String sellerId,
+            @PathVariable Long id) {
+        try {
+            return sellerOrderService.markOrderAsPaidBySeller(sellerId, id)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     // Get recent orders (last 7 days)
     @GetMapping("/recent")
     public ResponseEntity<List<OrderResponse>> getRecentOrders(
