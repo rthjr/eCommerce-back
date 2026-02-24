@@ -14,8 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,11 +55,30 @@ public class UserService {
     }
 
     private void updateUserFromRequest(User user, UserRequest userRequest) {
-        user.setName(userRequest.getFirstName() + " " + userRequest.getLastName());
-        user.setEmail(userRequest.getEmail());
+        String firstName = userRequest.getFirstName();
+        String lastName = userRequest.getLastName();
+        if (firstName != null || lastName != null) {
+            String fullName = String.format("%s %s",
+                    firstName != null ? firstName.trim() : "",
+                    lastName != null ? lastName.trim() : "")
+                    .trim();
+            if (!fullName.isEmpty()) {
+                user.setName(fullName);
+            }
+        }
+
+        if (userRequest.getEmail() != null && !userRequest.getEmail().isBlank()) {
+            user.setEmail(userRequest.getEmail());
+        }
         if (userRequest.getPhone() != null) {
             user.setPhone(userRequest.getPhone());
         }
+        if (userRequest.getRole() != null) {
+            user.setRoles(new HashSet<>(Set.of(userRequest.getRole().name())));
+        } else if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            user.setRoles(new HashSet<>(Set.of(UserRole.ROLE_CUSTOMER.name())));
+        }
+        user.setUpdatedAt(LocalDateTime.now());
     }
 
     private UserResponse mapToUserResponse(User user) {
@@ -72,16 +94,33 @@ public class UserService {
         response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
         response.setAvatar(user.getAvatar());
-        response.setRole(UserRole.ROLE_CUSTOMER); // Default role for now
+        UserRole resolvedRole = resolvePrimaryRole(user.getRoles());
+        response.setRole(resolvedRole);
 
         // Set computed fields
         response.setName(name);
-        response.setIsAdmin(false); // Default for now
+        response.setIsAdmin(resolvedRole == UserRole.ROLE_ADMIN);
         
         // Address is now managed separately via AddressController
         response.setAddress(null);
         
         return response;
+    }
+
+    private UserRole resolvePrimaryRole(Set<String> roles) {
+        Set<String> safeRoles = roles != null ? roles : Collections.emptySet();
+
+        if (safeRoles.contains(UserRole.ROLE_ADMIN.name())) {
+            return UserRole.ROLE_ADMIN;
+        }
+        if (safeRoles.contains(UserRole.ROLE_USER.name())) {
+            return UserRole.ROLE_USER;
+        }
+        if (safeRoles.contains(UserRole.ROLE_CUSTOMER.name())) {
+            return UserRole.ROLE_CUSTOMER;
+        }
+
+        return UserRole.ROLE_CUSTOMER;
     }
 
     // Delete user
