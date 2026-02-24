@@ -1,6 +1,7 @@
 package com.ecommerce.order.services;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class OrderService {
 	private final CartService cartService;
 	private final OrderRepository orderRepository;
 	private final ProductServiceClient productServiceClient;
+	private final ShippingPricingService shippingPricingService;
 
 	public Optional<OrderResponse> createOrder(String userId, CreateOrderRequest request) {
 		List<CartItem> cartItems = cartService.getCart(userId);
@@ -53,11 +55,26 @@ public class OrderService {
 		}
 
 		// Continue with existing order creation logic...
-		BigDecimal totalPrice = cartItems.stream().map(CartItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal itemsPrice = cartItems.stream()
+				.map(item -> safeMoney(item.getPrice())
+						.multiply(BigDecimal.valueOf(item.getQuantity() == null ? 0 : item.getQuantity())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		itemsPrice = money(itemsPrice);
+		BigDecimal shippingPrice = Optional.ofNullable(request)
+				.map(CreateOrderRequest::getShippingAddress)
+				.map(shippingPricingService::quoteShipping)
+				.map(com.ecommerce.order.dtos.ShippingQuoteResponse::getShippingPrice)
+				.map(this::money)
+				.orElseGet(() -> money(BigDecimal.ZERO));
+		BigDecimal taxPrice = money(BigDecimal.ZERO);
+		BigDecimal totalPrice = money(itemsPrice.add(shippingPrice).add(taxPrice));
 
 		Order order = new Order();
 		order.setUserId(userId);
 		order.setStatus(OrderStatus.CONFIRMED);
+		order.setItemsPrice(itemsPrice);
+		order.setShippingPrice(shippingPrice);
+		order.setTaxPrice(taxPrice);
 		order.setTotalAmount(totalPrice);
 		if (request != null) {
 			if (request.getShippingAddress() != null) {
@@ -170,6 +187,14 @@ public class OrderService {
 			com.ecommerce.order.models.PaymentResult payment) {
 		return new com.ecommerce.order.dtos.PaymentResultDTO(payment.getPaymentId(), payment.getStatus(),
 				payment.getUpdateTime(), payment.getEmailAddress());
+	}
+
+	private BigDecimal safeMoney(BigDecimal value) {
+		return value == null ? BigDecimal.ZERO : value;
+	}
+
+	private BigDecimal money(BigDecimal value) {
+		return safeMoney(value).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	// Get order by ID
