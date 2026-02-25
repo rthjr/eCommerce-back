@@ -49,6 +49,7 @@ public class GateWayConfig {
 				.route("order-service", r -> r.path(
 						"/api/orders/**",
 						"/api/cart/**",
+						"/api/analytics/**",
 						"/api/returns",
 						"/api/returns/**",
 						"/api/sellers/orders/**",
