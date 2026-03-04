@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.order.clients.ProductServiceClient;
@@ -31,6 +33,14 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final ProductServiceClient productServiceClient;
 	private final ShippingPricingService shippingPricingService;
+
+	private final RabbitTemplate rabbitTemplate;
+
+	@Value("${rabbitmq.exchange.name}")
+	private String exchangeName;
+
+	@Value("${rabbitmq.routing.key}")
+	private String routingKey;
 
 	public Optional<OrderResponse> createOrder(String userId, CreateOrderRequest request) {
 		List<CartItem> cartItems = cartService.getCart(userId);
@@ -60,11 +70,9 @@ public class OrderService {
 						.multiply(BigDecimal.valueOf(item.getQuantity() == null ? 0 : item.getQuantity())))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		itemsPrice = money(itemsPrice);
-		BigDecimal shippingPrice = Optional.ofNullable(request)
-				.map(CreateOrderRequest::getShippingAddress)
+		BigDecimal shippingPrice = Optional.ofNullable(request).map(CreateOrderRequest::getShippingAddress)
 				.map(shippingPricingService::quoteShipping)
-				.map(com.ecommerce.order.dtos.ShippingQuoteResponse::getShippingPrice)
-				.map(this::money)
+				.map(com.ecommerce.order.dtos.ShippingQuoteResponse::getShippingPrice).map(this::money)
 				.orElseGet(() -> money(BigDecimal.ZERO));
 		BigDecimal taxPrice = money(BigDecimal.ZERO);
 		BigDecimal totalPrice = money(itemsPrice.add(shippingPrice).add(taxPrice));
@@ -85,21 +93,22 @@ public class OrderService {
 			}
 		}
 
-		List<OrderItem> orderItems = cartItems.stream()
-				.map(item -> {
-					OrderItem orderItem = new OrderItem();
-					orderItem.setOrder(order);
-					orderItem.setProductId(item.getProductId());
-					orderItem.setProductName(item.getProductName());
-					orderItem.setProductImage(item.getProductImage());
-					orderItem.setQuantity(item.getQuantity());
-					orderItem.setPrice(item.getPrice());
-					return orderItem;
-				})
-				.collect(java.util.stream.Collectors.toList());
+		List<OrderItem> orderItems = cartItems.stream().map(item -> {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrder(order);
+			orderItem.setProductId(item.getProductId());
+			orderItem.setProductName(item.getProductName());
+			orderItem.setProductImage(item.getProductImage());
+			orderItem.setQuantity(item.getQuantity());
+			orderItem.setPrice(item.getPrice());
+			return orderItem;
+		}).collect(java.util.stream.Collectors.toList());
 
 		order.setItems(orderItems);
 		Order savedOrder = orderRepository.save(order);
+
+		rabbitTemplate.convertAndSend(exchangeName, routingKey,
+				order);
 
 		// Clear the cart
 		cartService.clearCart(userId);
@@ -109,28 +118,25 @@ public class OrderService {
 
 	private OrderResponse mapToOrderResponse(Order order) {
 		Map<String, ProductResponse> productCache = new HashMap<>();
-		List<OrderItemDTO> items = order.getItems().stream()
-				.map(orderItem -> {
-					String productName = orderItem.getProductName();
-					String imageUrl = orderItem.getProductImage();
-					boolean needsLookup = (productName == null || productName.isBlank())
-							|| (imageUrl == null || imageUrl.isBlank());
-					ProductResponse product = needsLookup
-							? getProductDetailsCached(orderItem.getProductId(), productCache)
-							: null;
+		List<OrderItemDTO> items = order.getItems().stream().map(orderItem -> {
+			String productName = orderItem.getProductName();
+			String imageUrl = orderItem.getProductImage();
+			boolean needsLookup = (productName == null || productName.isBlank())
+					|| (imageUrl == null || imageUrl.isBlank());
+			ProductResponse product = needsLookup ? getProductDetailsCached(orderItem.getProductId(), productCache)
+					: null;
 
-					if (productName == null || productName.isBlank()) {
-						productName = product != null ? product.getName() : null;
-					}
-					if (imageUrl == null || imageUrl.isBlank()) {
-						imageUrl = resolveProductImage(product);
-					}
+			if (productName == null || productName.isBlank()) {
+				productName = product != null ? product.getName() : null;
+			}
+			if (imageUrl == null || imageUrl.isBlank()) {
+				imageUrl = resolveProductImage(product);
+			}
 
-					return new OrderItemDTO(orderItem.getId(), orderItem.getProductId(), productName, imageUrl,
-							orderItem.getQuantity(), orderItem.getPrice(),
-							orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity())));
-				})
-				.toList();
+			return new OrderItemDTO(orderItem.getId(), orderItem.getProductId(), productName, imageUrl,
+					orderItem.getQuantity(), orderItem.getPrice(),
+					orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity())));
+		}).toList();
 
 		return new OrderResponse(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), items,
 				order.getShippingAddress() != null ? mapToShippingAddressDTO(order.getShippingAddress()) : null,

@@ -1,6 +1,7 @@
 package com.ecommerce.order.config;
 
 
+
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -19,54 +20,53 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfiguration {
-	
-	@Value("${rabbitmq.queue.name}")
-	private String queueName;
-	
-	@Value("${rabbitmq.exchange.name}")
-	private String exchangeName;
-	
-	@Value("${rabbitmq.routing.key}")
-	private String routingKey;
-	
-	  @Bean
-	    public Queue queue() {
-	        return QueueBuilder.durable(queueName)
-	                .build();
-	    }
+    @Value("${rabbitmq.queue.name}")
+    private String queueName;
 
-	    @Bean
-	    public TopicExchange exchange(){
-	        return ExchangeBuilder.topicExchange(exchangeName)
-	                .durable(true)
-	                .build();
-	    }
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
 
-	    @Bean
-	    public Binding binding() {
-	        return BindingBuilder.bind(queue())
-	                .to(exchange())
-	                .with(routingKey);
-	    }
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
-	    @Bean
-	    public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
-	        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-	        admin.setAutoStartup(true);
-	        return admin;
-	    }
+    @Bean
+    public Queue queue() {
+        return QueueBuilder.durable(queueName)
+                .build();
+    }
 
-	    @Bean
-	    public MessageConverter messageConverter() {
-	        return new Jackson2JsonMessageConverter();
-	    }
+    @Bean
+    public TopicExchange exchange(){
+        return ExchangeBuilder.topicExchange(exchangeName)
+                .durable(true)
+                .build();
+    }
 
-	    @Bean
-	    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-	        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-	        template.setMessageConverter(messageConverter());
-	        template.setExchange(exchangeName);
-	        return template;
-	    }
+    @Bean
+    public Binding binding() {
+        return BindingBuilder.bind(queue())
+                .to(exchange())
+                .with(routingKey);
+    }
+
+    @Bean
+    public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
+        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
+        admin.setAutoStartup(true);
+        return admin;
+    }
+
+    @Bean
+    public MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(messageConverter());
+        template.setExchange(exchangeName);
+        return template;
+    }
 }
 
