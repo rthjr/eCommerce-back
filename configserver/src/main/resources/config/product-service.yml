@@ -5,10 +5,8 @@ spring:
     username: rthjr
     password: rthjr
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    connection-timeout: ${CONNECTION_TIMEOUT:30000}
+    addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
   jpa:
     database: POSTGRESQL
     show-sql: true

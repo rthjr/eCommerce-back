@@ -9,10 +9,8 @@ spring:
         native:
           search-locations: file:////C:\Users\sovan\Desktop\Defend Project\fullstack\ecom-applications\configserver\src\main\resources\config
   rabbitmq:
-    host: localhost
-    port: 5672
-    password: guest
-    username: guest
+    connection-timeout: ${CONNECTION_TIMEOUT:30000}
+    addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
 #          search-locations: classpath:/config
 
 server:

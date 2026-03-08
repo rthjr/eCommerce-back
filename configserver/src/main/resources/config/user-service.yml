@@ -4,11 +4,8 @@ spring:
       uri: mongodb+srv://sovannarithphan9_db_user:4TjhTw5-bQg824p@user-data.unip0bf.mongodb.net/?appName=user-data
       database: ecom_user
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-
+    connection-timeout: ${CONNECTION_TIMEOUT:30000}
+    addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
 server:
   port: 8082
 
