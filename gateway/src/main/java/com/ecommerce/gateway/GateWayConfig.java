@@ -51,6 +51,7 @@ public class GateWayConfig {
 						"/api/cart/**",
 						"/api/analytics/**",
 						"/api/admin/**",
+						"/api/shipping/**",
 						"/api/returns",
 						"/api/returns/**",
 						"/api/sellers/orders/**",
