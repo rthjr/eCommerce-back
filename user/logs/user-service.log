@@ -207,3 +207,100 @@ Caused by: java.net.ConnectException: Connection refused: getsockopt
 2026-03-08T21:46:07.878+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
 2026-03-08T21:51:07.905+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
 2026-03-08T21:56:09.049+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:01:09.797+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:06:09.848+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:07:50.743+07:00  INFO 19988 --- [user-service] [http-nio-8082-exec-10] [69ad90c6f3319f28df77837a6270f54e-5e89fe22239726dc] c.e.user.services.SessionService         : Creating new session for user: 6978de3c1ab9e931e162b630 from IP: 0:0:0:0:0:0:0:1
+2026-03-08T22:11:09.925+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:16:09.984+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:17:56.230+07:00  INFO 19988 --- [user-service] [http-nio-8082-exec-10] [69ad9323f16746ecf1576d8b8fb2fbc8-08459f74d5985959] c.e.user.services.SessionService         : Creating new session for user: 6977a226e5fc366c4741c48e from IP: 0:0:0:0:0:0:0:1
+2026-03-08T22:21:10.042+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:26:10.088+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:31:10.113+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:36:10.163+07:00  INFO 19988 --- [user-service] [AsyncResolver-bootstrap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-03-08T22:39:25.084+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(166)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:25.084+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:25.276+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(168)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:25.317+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application USER-SERVICE with eureka with status DOWN
+2026-03-08T22:39:25.321+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1772984365321, current=DOWN, previous=UP]
+2026-03-08T22:39:25.328+07:00  INFO 19988 --- [user-service] [DiscoveryClient-InstanceInfoReplicator-%d] [                                                 ] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_USER-SERVICE/localhost:user-service:8082: registering service...
+2026-03-08T22:39:25.494+07:00  INFO 19988 --- [user-service] [DiscoveryClient-InstanceInfoReplicator-%d] [                                                 ] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_USER-SERVICE/localhost:user-service:8082 - registration status: 204
+2026-03-08T22:39:25.624+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(169)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:25.767+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(170)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:25.840+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.a.r.l.SimpleMessageListenerContainer : Waiting for workers to finish.
+2026-03-08T22:39:25.938+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(171)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:26.147+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(172)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:26.209+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.a.r.l.SimpleMessageListenerContainer : Successfully waited for workers to finish.
+2026-03-08T22:39:26.218+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.i.a.i.AmqpInboundChannelAdapter      : stopped bean 'inbound.springCloudBus.anonymous.Vj-ZpuUhQyagJ901A2nESg'
+2026-03-08T22:39:26.338+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(173)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:26.383+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.c.stream.binder.BinderErrorChannel   : Channel 'user-service.rabbit-2080939964.springCloudBusInput.errors' has 1 subscriber(s).
+2026-03-08T22:39:26.389+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.c.stream.binder.BinderErrorChannel   : Channel 'user-service.rabbit-2080939964.springCloudBusInput.errors' has 0 subscriber(s).
+2026-03-08T22:39:26.415+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-03-08T22:39:26.450+07:00  INFO 19988 --- [user-service] [tomcat-shutdown] [                                                 ] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-03-08T22:39:26.540+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(174)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:26.713+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(175)-127.0.0.1] [                                                 ] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2026-03-08T22:39:26.714+07:00  WARN 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.c.support.DefaultLifecycleProcessor  : Failed to stop bean 'reactorResourceFactory'
+
+reactor.core.Exceptions$ReactiveException: java.lang.InterruptedException
+	at reactor.core.Exceptions.propagate(Exceptions.java:410) ~[reactor-core-3.7.3.jar:3.7.3]
+	at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:96) ~[reactor-core-3.7.3.jar:3.7.3]
+	at reactor.core.publisher.Mono.block(Mono.java:1779) ~[reactor-core-3.7.3.jar:3.7.3]
+	at org.springframework.http.client.ReactorResourceFactory.stop(ReactorResourceFactory.java:298) ~[spring-web-6.2.3.jar:6.2.3]
+	at org.springframework.context.SmartLifecycle.stop(SmartLifecycle.java:120) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStop(DefaultLifecycleProcessor.java:384) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.stop(DefaultLifecycleProcessor.java:526) ~[spring-context-6.2.3.jar:6.2.3]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[na:na]
+	at org.springframework.context.support.DefaultLifecycleProcessor.stopBeans(DefaultLifecycleProcessor.java:353) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.context.support.DefaultLifecycleProcessor.onClose(DefaultLifecycleProcessor.java:253) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.context.support.AbstractApplicationContext.doClose(AbstractApplicationContext.java:1172) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:179) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.boot.admin.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin.shutdown(SpringApplicationAdminMXBeanRegistrar.java:160) ~[spring-boot-3.4.3.jar:3.4.3]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at sun.reflect.misc.Trampoline.invoke(MethodUtil.java:64) ~[na:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at java.base/sun.reflect.misc.MethodUtil.invoke(MethodUtil.java:97) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.ConvertingMethod.invokeWithOpenReturn(ConvertingMethod.java:193) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.ConvertingMethod.invokeWithOpenReturn(ConvertingMethod.java:175) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.MXBeanIntrospector.invokeM2(MXBeanIntrospector.java:115) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.MXBeanIntrospector.invokeM2(MXBeanIntrospector.java:52) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.MBeanIntrospector.invokeM(MBeanIntrospector.java:236) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.PerInterface.invoke(PerInterface.java:138) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.MBeanSupport.invoke(MBeanSupport.java:252) ~[na:na]
+	at java.management/com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.invoke(DefaultMBeanServerInterceptor.java:803) ~[na:na]
+	at java.management/com.sun.jmx.mbeanserver.JmxMBeanServer.invoke(JmxMBeanServer.java:802) ~[na:na]
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doOperation(RMIConnectionImpl.java:1472) ~[na:na]
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl$PrivilegedOperation.run(RMIConnectionImpl.java:1310) ~[na:na]
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doPrivilegedOperation(RMIConnectionImpl.java:1405) ~[na:na]
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.invoke(RMIConnectionImpl.java:829) ~[na:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360) ~[na:na]
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200) ~[na:na]
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197) ~[na:na]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714) ~[na:na]
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196) ~[na:na]
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598) ~[na:na]
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844) ~[na:na]
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721) ~[na:na]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400) ~[na:na]
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+Caused by: java.lang.InterruptedException: null
+	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1100) ~[na:na]
+	at java.base/java.util.concurrent.CountDownLatch.await(CountDownLatch.java:230) ~[na:na]
+	at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:91) ~[reactor-core-3.7.3.jar:3.7.3]
+	... 46 common frames omitted
+
+2026-03-08T22:39:26.870+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.i.endpoint.EventDrivenConsumer       : Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2026-03-08T22:39:26.870+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.i.channel.PublishSubscribeChannel    : Channel 'user-service.errorChannel' has 0 subscriber(s).
+2026-03-08T22:39:26.871+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.i.endpoint.EventDrivenConsumer       : stopped bean '_org.springframework.integration.errorLogger'
+2026-03-08T22:39:27.020+07:00  WARN 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] o.s.b.f.support.DisposableBeanAdapter    : Invocation of close method failed on bean with name 'mongo': com.mongodb.MongoInterruptedException: Interrupted waiting for lock
+2026-03-08T22:39:27.029+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2026-03-08T22:39:27.030+07:00  WARN 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator stop interrupted
+2026-03-08T22:39:27.032+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] com.netflix.discovery.DiscoveryClient    : Unregistering ...
+2026-03-08T22:39:27.057+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_USER-SERVICE/localhost:user-service:8082 - deregister  status: 200
+2026-03-08T22:39:27.058+07:00  INFO 19988 --- [user-service] [RMI TCP Connection(167)-127.0.0.1] [                                                 ] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
