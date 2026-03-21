@@ -77,6 +77,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/actuator/prometheus").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/oauth2/**").permitAll()
                 .requestMatchers("/oauth2/**").permitAll()
