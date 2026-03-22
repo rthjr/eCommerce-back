@@ -50,6 +50,7 @@ services:
       - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/product/logs:/logs/product:ro
       - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/order/logs:/logs/order:ro
       - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/user/logs:/logs/user:ro
+      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/payment-gateway/logs:/logs/payment:ro
     command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - 42345:12345

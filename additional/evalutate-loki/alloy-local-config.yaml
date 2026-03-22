@@ -19,6 +19,11 @@ local.file_match "spring_services" {
       service   = "user-service",
       env       = "local",
     },
+    {
+      __path__ = "/logs/payment/payment-service.log",
+      service   = "payment-service",
+      env       = "local",
+    },
   ]
 }
 
