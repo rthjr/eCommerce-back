@@ -1,4 +1,4 @@
-package com.demo.consumer;
+	package com.demo.consumer;
 
 public class RiderLocation {
     private String riderId;

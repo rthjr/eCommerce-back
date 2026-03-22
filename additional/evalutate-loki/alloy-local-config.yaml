@@ -1,30 +1,67 @@
-discovery.docker "flog_scrape" {
-	host             = "unix:///var/run/docker.sock"
-	refresh_interval = "5s"
+// -------------------------------------------------------------------
+// Tail log files from the three Spring Boot services
+// -------------------------------------------------------------------
+
+local.file_match "spring_services" {
+  path_targets = [
+    {
+      __path__ = "/logs/product/product-service.log",
+      service   = "product-service",
+      env       = "local",
+    },
+    {
+      __path__ = "/logs/order/order-service.log",
+      service   = "order-service",
+      env       = "local",
+    },
+    {
+      __path__ = "/logs/user/user-service.log",
+      service   = "user-service",
+      env       = "local",
+    },
+  ]
 }
 
-discovery.relabel "flog_scrape" {
-	targets = []
-
-	rule {
-		source_labels = ["__meta_docker_container_name"]
-		regex         = "/(.*)"
-		target_label  = "container"
-	}
+loki.source.file "spring_logs" {
+  targets    = local.file_match.spring_services.targets
+  forward_to = [loki.process.parse_spring.receiver]
 }
 
-loki.source.docker "flog_scrape" {
-	host             = "unix:///var/run/docker.sock"
-	targets          = discovery.docker.flog_scrape.targets
-	forward_to       = [loki.write.default.receiver]
-	relabel_rules    = discovery.relabel.flog_scrape.rules
-	refresh_interval = "5s"
+// -------------------------------------------------------------------
+// Parse Spring Boot multi-line logs
+// -------------------------------------------------------------------
+
+loki.process "parse_spring" {
+  // Merge multi-line stack traces into one log entry
+  stage.multiline {
+    firstline     = "^\\d{4}-\\d{2}-\\d{2}T"
+    max_wait_time = "3s"
+  }
+
+  // Extract level, logger, and thread from the Spring Boot log format
+  stage.regex {
+    expression = "^(?P<timestamp>\\S+)\\s+(?P<level>\\w+)\\s+\\d+\\s+---\\s+\\[(?P<app>[^\\]]+)\\]\\s+\\[(?P<thread>[^\\]]+)\\].*?(?P<logger>[\\w\\.\\$]+)\\s*:"
+  }
+
+  stage.labels {
+    values = {
+      level  = "level",
+      logger = "logger",
+      thread = "thread",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
 }
+
+// -------------------------------------------------------------------
+// Write to Loki via the gateway
+// -------------------------------------------------------------------
 
 loki.write "default" {
-	endpoint {
-		url       = "http://gateway:3100/loki/api/v1/push"
-		tenant_id = "tenant1"
-	}
-	external_labels = {}
+  endpoint {
+    url       = "http://gateway:3100/loki/api/v1/push"
+    tenant_id = "tenant1"
+  }
+  external_labels = {}
 }

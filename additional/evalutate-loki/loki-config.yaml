@@ -43,3 +43,32 @@ ruler:
 
 compactor:
   working_directory: /tmp/compactor
+  # Enable compactor to enforce retention deletion
+  retention_enabled: true
+  # Run compaction every 10 minutes
+  compaction_interval: 10m
+  # Delete chunks older than retention after they are already compacted
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+
+# -------------------------------------------------------
+# Retention: keep logs for 1 day only
+# -------------------------------------------------------
+limits_config:
+  retention_period: 24h
+  # Maximum time range a query can span (prevents runaway queries)
+  max_query_length: 25h
+
+# -------------------------------------------------------
+# Query caching: cache results for up to 1 day
+# -------------------------------------------------------
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        # Max memory the cache can use (MB)
+        max_size_mb: 100
+        # Evict cache entries older than 1 day
+        ttl: 24h
+  cache_results: true

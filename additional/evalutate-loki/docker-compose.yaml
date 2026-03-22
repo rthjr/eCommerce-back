@@ -7,7 +7,7 @@ services:
     image: grafana/loki:latest
     command: "-config.file=/etc/loki/config.yaml -target=read"
     ports:
-      - 3101:3100
+      - 4201:3100
       - 7946
       - 9095
     volumes:
@@ -28,7 +28,7 @@ services:
     image: grafana/loki:latest
     command: "-config.file=/etc/loki/config.yaml -target=write"
     ports:
-      - 3102:3100
+      - 4202:3100
       - 7946
       - 9095
     volumes:
@@ -47,10 +47,12 @@ services:
     image: grafana/alloy:latest
     volumes:
       - ./alloy-local-config.yaml:/etc/alloy/config.alloy:ro
-      - /var/run/docker.sock:/var/run/docker.sock
+      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/product/logs:/logs/product:ro
+      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/order/logs:/logs/order:ro
+      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/user/logs:/logs/user:ro
     command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
-      - 12345:12345
+      - 42345:12345
     depends_on:
       - gateway
     networks:
@@ -109,7 +111,7 @@ services:
         EOF
         /run.sh
     ports:
-      - "3000:3000"
+      - "4203:3000"
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
       interval: 10s
@@ -192,7 +194,7 @@ services:
         EOF
         /docker-entrypoint.sh nginx -g "daemon off;"
     ports:
-      - "3100:3100"
+      - "4200:3100"
     healthcheck:
       test: ["CMD", "service", "nginx", "status"]
       interval: 10s
