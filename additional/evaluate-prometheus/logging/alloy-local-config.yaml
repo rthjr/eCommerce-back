@@ -1,3 +1,7 @@
+// -------------------------------------------------------------------
+// Docker container log discovery (flog / other containers)
+// -------------------------------------------------------------------
+
 discovery.docker "flog_scrape" {
 	host             = "unix:///var/run/docker.sock"
 	refresh_interval = "5s"
@@ -22,6 +26,10 @@ loki.source.docker "flog_scrape" {
 }
 
 
+// -------------------------------------------------------------------
+// System logs
+// -------------------------------------------------------------------
+
 local.file_match "system_logs" {
 	path_targets = [{"__path__" = "/var/log/*.log"}]
 	sync_period  = "5s"
@@ -34,17 +42,9 @@ loki.source.file "system_file_scrape" {
 }
 
 
-local.file_match "loki_app_logs" {
-	path_targets = [{"__path__" = "/logs/*.log"}]
-	sync_period  = "5s"
-}
-
-loki.source.file "loki_app_file_scrape" {
-	targets       = local.file_match.loki_app_logs.targets
-	forward_to    = [loki.write.default.receiver]
-	tail_from_end = true
-}
-
+// -------------------------------------------------------------------
+// Spring Boot app logs from /logs-parent (text format)
+// -------------------------------------------------------------------
 
 local.file_match "parent_app_logs" {
 	path_targets = [{"__path__" = "/logs-parent/*.log"}]
@@ -53,9 +53,77 @@ local.file_match "parent_app_logs" {
 
 loki.source.file "parent_app_file_scrape" {
 	targets       = local.file_match.parent_app_logs.targets
-	forward_to    = [loki.write.default.receiver]
+	forward_to    = [loki.process.parse_spring.receiver]
 	tail_from_end = true
 }
+
+loki.process "parse_spring" {
+	// Merge multi-line stack traces
+	stage.multiline {
+		firstline     = "^\\d{4}-\\d{2}-\\d{2}T"
+		max_wait_time = "3s"
+	}
+
+	stage.regex {
+		expression = "^(?P<timestamp>\\S+)\\s+(?P<level>\\w+)\\s+\\d+\\s+---\\s+\\[(?P<app>[^\\]]+)\\]\\s+\\[(?P<thread>[^\\]]+)\\].*?(?P<logger>[\\w\\.\\$]+)\\s*:"
+	}
+
+	stage.labels {
+		values = {
+			level  = "level",
+			logger = "logger",
+			thread = "thread",
+		}
+	}
+
+	forward_to = [loki.write.default.receiver]
+}
+
+
+// -------------------------------------------------------------------
+// Python FastAPI payment-service logs (JSON format via python-json-logger)
+// Mounted from ../../payment-gateway/logs -> /logs/payment
+// -------------------------------------------------------------------
+
+local.file_match "payment_logs" {
+	path_targets = [{
+		"__path__" = "/logs/payment/payment-service.log",
+		service    = "payment-service",
+		env        = "local",
+	}]
+	sync_period = "5s"
+}
+
+loki.source.file "payment_file_scrape" {
+	targets       = local.file_match.payment_logs.targets
+	forward_to    = [loki.process.parse_python.receiver]
+	tail_from_end = true
+}
+
+loki.process "parse_python" {
+	// Extract fields from python-json-logger JSON lines
+	stage.json {
+		expressions = {
+			level   = "levelname",
+			logger  = "name",
+			message = "message",
+		}
+	}
+
+	stage.labels {
+		values = {
+			level  = "level",
+			logger = "logger",
+		}
+	}
+
+	forward_to = [loki.write.default.receiver]
+}
+
+
+// -------------------------------------------------------------------
+// Write to Loki via gateway
+// -------------------------------------------------------------------
 
 loki.write "default" {
 	endpoint {

@@ -1,1 +1,12 @@
 nul
+
+# -------------------------------------------------------
+# Log files — never commit these
+# -------------------------------------------------------
+*.log
+*.log.*
+*.log.gz
+
+# Log directories (product/logs, order/logs, user/logs, etc.)
+**/logs/
+logs/

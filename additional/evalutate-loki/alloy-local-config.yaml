@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// Tail log files from the three Spring Boot services
+// Tail Spring Boot log files (Java — text format)
 // -------------------------------------------------------------------
 
 local.file_match "spring_services" {
@@ -19,6 +19,20 @@ local.file_match "spring_services" {
       service   = "user-service",
       env       = "local",
     },
+  ]
+}
+
+loki.source.file "spring_logs" {
+  targets    = local.file_match.spring_services.targets
+  forward_to = [loki.process.parse_spring.receiver]
+}
+
+// -------------------------------------------------------------------
+// Tail Python FastAPI log files (payment — JSON format)
+// -------------------------------------------------------------------
+
+local.file_match "python_services" {
+  path_targets = [
     {
       __path__ = "/logs/payment/payment-service.log",
       service   = "payment-service",
@@ -27,9 +41,9 @@ local.file_match "spring_services" {
   ]
 }
 
-loki.source.file "spring_logs" {
-  targets    = local.file_match.spring_services.targets
-  forward_to = [loki.process.parse_spring.receiver]
+loki.source.file "python_logs" {
+  targets    = local.file_match.python_services.targets
+  forward_to = [loki.process.parse_python.receiver]
 }
 
 // -------------------------------------------------------------------
@@ -53,6 +67,30 @@ loki.process "parse_spring" {
       level  = "level",
       logger = "logger",
       thread = "thread",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+// -------------------------------------------------------------------
+// Parse Python FastAPI JSON logs (python-json-logger format)
+// -------------------------------------------------------------------
+
+loki.process "parse_python" {
+  // Extract fields from the JSON log line produced by python-json-logger
+  stage.json {
+    expressions = {
+      level   = "levelname",
+      logger  = "name",
+      message = "message",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level  = "level",
+      logger = "logger",
     }
   }
 
