@@ -7,7 +7,7 @@ spring:
     config:
       server:
         native:
-          search-locations: file:////C:\Users\sovan\Desktop\Defend Project\fullstack\ecom-applications\configserver\src\main\resources\config
+          search-locations: file:////D:\uni-school\testcode\eCommerce-back\configserver\src\main\resources\config
   rabbitmq:
     connection-timeout: ${CONNECTION_TIMEOUT:30000}
     addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
