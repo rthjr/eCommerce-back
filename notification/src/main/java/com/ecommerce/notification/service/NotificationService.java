@@ -49,4 +49,21 @@ public class NotificationService {
 					e.getMessage());
 		}
 	}
+
+	public void sendPaymentPendingNotification(PaymentEvent event) {
+		try {
+			UserDTO user = userServiceClient.getUserById(event.getUserId());
+
+			if (user != null && user.getEmail() != null) {
+				emailService.sendPaymentPendingEmail(user.getEmail(), user.getName(), event);
+				log.info("📧 Payment pending notification sent to user: {}", user.getEmail());
+			} else {
+				log.warn("⚠️ User email not found for userId: {}", event.getUserId());
+			}
+
+		} catch (Exception e) {
+			log.error("❌ Failed to send payment pending notification for user {}: {}", event.getUserId(),
+					e.getMessage());
+		}
+	}
 }

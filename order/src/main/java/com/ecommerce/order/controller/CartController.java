@@ -34,6 +34,12 @@ public class CartController {
 		return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
 	}
 
+	@DeleteMapping
+	public ResponseEntity<Void> clearCart(@RequestHeader("X-User-ID") String userId) {
+		cartService.clearCart(userId);
+		return ResponseEntity.noContent().build();
+	}
+
 	@GetMapping
 	public ResponseEntity<List<CartItemResponse>> getCart(@RequestHeader("X-User-ID") String userId) {
 		return ResponseEntity.ok(cartService.getCartWithDetails(userId));
