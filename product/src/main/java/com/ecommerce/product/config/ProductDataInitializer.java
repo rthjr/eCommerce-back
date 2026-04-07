@@ -29,8 +29,8 @@ public class ProductDataInitializer {
                         new BigDecimal("349.99"), new BigDecimal("299.99"),
                         45, "Electronics",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/3394655/pexels-photo-3394655.jpeg",
-                            "https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg"
+                            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("One Size"), Arrays.asList("Midnight Black", "Platinum Silver"),
                         "Tech", "Sony", 4.8, 1284
@@ -42,8 +42,8 @@ public class ProductDataInitializer {
                         new BigDecimal("1299.99"), null,
                         20, "Electronics",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg",
-                            "https://images.pexels.com/photos/1029757/pexels-photo-1029757.jpeg"
+                            "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("13-inch", "15-inch"),
                         Arrays.asList("Midnight", "Starlight", "Space Gray"),
@@ -56,8 +56,8 @@ public class ProductDataInitializer {
                         new BigDecimal("99.99"), new BigDecimal("84.99"),
                         60, "Electronics",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/845434/pexels-photo-845434.jpeg",
-                            "https://images.pexels.com/photos/2115257/pexels-photo-2115257.jpeg"
+                            "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1615750173692-ca4e8c5a21ca?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("Standard"),
                         Arrays.asList("Graphite", "Pale Gray"),
@@ -70,7 +70,8 @@ public class ProductDataInitializer {
                         new BigDecimal("449.99"), new BigDecimal("379.99"),
                         18, "Electronics",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg"
+                            "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1593640408182-31c228b59f51?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("27-inch"),
                         Arrays.asList("Black"),
@@ -83,8 +84,8 @@ public class ProductDataInitializer {
                         new BigDecimal("399.99"), new BigDecimal("349.99"),
                         35, "Wearables",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg",
-                            "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg"
+                            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("41mm", "45mm"),
                         Arrays.asList("Midnight", "Starlight", "Product RED"),
@@ -97,7 +98,8 @@ public class ProductDataInitializer {
                         new BigDecimal("45.99"), null,
                         120, "Electronics",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/4219654/pexels-photo-4219654.jpeg"
+                            "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("One Size"),
                         Arrays.asList("Black", "White"),
@@ -112,8 +114,8 @@ public class ProductDataInitializer {
                         new BigDecimal("19.99"), null,
                         150, "T-Shirt",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg",
-                            "https://images.pexels.com/photos/1656684/pexels-photo-1656684.jpeg"
+                            "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("XS", "S", "M", "L", "XL", "XXL"),
                         Arrays.asList("White", "Black", "Navy", "Olive"),
@@ -126,7 +128,8 @@ public class ProductDataInitializer {
                         new BigDecimal("34.99"), new BigDecimal("27.99"),
                         80, "T-Shirt",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg"
+                            "https://images.unsplash.com/photo-1571945153237-4929e783af4a?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Black", "Gray", "Royal Blue"),
@@ -139,7 +142,8 @@ public class ProductDataInitializer {
                         new BigDecimal("89.99"), null,
                         65, "T-Shirt",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/428340/pexels-photo-428340.jpeg"
+                            "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Navy", "White", "Forest Green"),
@@ -154,7 +158,8 @@ public class ProductDataInitializer {
                         new BigDecimal("79.99"), new BigDecimal("64.99"),
                         55, "Shirts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/887352/pexels-photo-887352.jpeg"
+                            "https://images.unsplash.com/photo-1594938298603-c8148c4b4733?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("White", "Light Blue", "Charcoal"),
@@ -167,7 +172,8 @@ public class ProductDataInitializer {
                         new BigDecimal("49.99"), new BigDecimal("39.99"),
                         70, "Shirts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/1336873/pexels-photo-1336873.jpeg"
+                            "https://images.unsplash.com/photo-1602810316693-3667c854239a?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Beige", "Light Blue", "Sage Green"),
@@ -180,7 +186,8 @@ public class ProductDataInitializer {
                         new BigDecimal("54.99"), null,
                         60, "Shirts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg"
+                            "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Black", "Steel Gray"),
@@ -195,7 +202,8 @@ public class ProductDataInitializer {
                         new BigDecimal("65.99"), new BigDecimal("54.99"),
                         50, "Hoodie",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/6311399/pexels-photo-6311399.jpeg"
+                            "https://images.unsplash.com/photo-1556821840-3a63f15732ce?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL", "XXL"),
                         Arrays.asList("Black", "Oxford Gray", "Navy"),
@@ -208,7 +216,8 @@ public class ProductDataInitializer {
                         new BigDecimal("59.99"), null,
                         45, "Hoodie",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/7675413/pexels-photo-7675413.jpeg"
+                            "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Black", "Dark Blue"),
@@ -221,7 +230,8 @@ public class ProductDataInitializer {
                         new BigDecimal("149.99"), null,
                         25, "Hoodie",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/921265/pexels-photo-921265.jpeg"
+                            "https://images.unsplash.com/photo-1611911813383-67769b37a149?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1565693413579-8ff3fdc1b03b?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("M", "L", "XL"),
                         Arrays.asList("Charcoal", "Navy"),
@@ -236,7 +246,8 @@ public class ProductDataInitializer {
                         new BigDecimal("69.99"), new BigDecimal("54.99"),
                         75, "Jeans",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/2983462/pexels-photo-2983462.jpeg"
+                            "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1475178626620-a4d074967452?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("28", "30", "32", "34", "36"),
                         Arrays.asList("Indigo", "Black", "Dark Wash"),
@@ -249,7 +260,8 @@ public class ProductDataInitializer {
                         new BigDecimal("59.99"), null,
                         60, "Jeans",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg"
+                            "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1555689502-c4b22d76c56f?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("30", "32", "34", "36", "38"),
                         Arrays.asList("Dark Indigo"),
@@ -262,7 +274,8 @@ public class ProductDataInitializer {
                         new BigDecimal("64.99"), new BigDecimal("52.99"),
                         40, "Jeans",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/532556/pexels-photo-532556.jpeg"
+                            "https://images.unsplash.com/photo-1604176354204-9268737828e4?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("30", "32", "34", "36"),
                         Arrays.asList("Black", "Midnight Gray"),
@@ -277,7 +290,8 @@ public class ProductDataInitializer {
                         new BigDecimal("34.99"), new BigDecimal("27.99"),
                         90, "Shorts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/3775537/pexels-photo-3775537.jpeg"
+                            "https://images.unsplash.com/photo-1591195853828-11db59a44f43?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("S", "M", "L", "XL"),
                         Arrays.asList("Black", "Navy", "Dark Gray"),
@@ -290,7 +304,8 @@ public class ProductDataInitializer {
                         new BigDecimal("39.99"), null,
                         85, "Shorts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/2529147/pexels-photo-2529147.jpeg"
+                            "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("28", "30", "32", "34", "36"),
                         Arrays.asList("Khaki", "Beige", "Olive"),
@@ -303,7 +318,8 @@ public class ProductDataInitializer {
                         new BigDecimal("49.99"), null,
                         45, "Shorts",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/631139/pexels-photo-631139.jpeg"
+                            "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("30", "32", "34", "36"),
                         Arrays.asList("Beige", "Light Gray"),
@@ -318,8 +334,8 @@ public class ProductDataInitializer {
                         new BigDecimal("129.99"), new BigDecimal("109.99"),
                         30, "Footwear",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
-                            "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg"
+                            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("7", "8", "9", "10", "11", "12"),
                         Arrays.asList("Black/White", "Blue/White", "Wolf Gray"),
@@ -332,7 +348,8 @@ public class ProductDataInitializer {
                         new BigDecimal("179.99"), new BigDecimal("149.99"),
                         22, "Footwear",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg"
+                            "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("7", "8", "9", "10", "11"),
                         Arrays.asList("Core Black", "Cloud White"),
@@ -347,8 +364,8 @@ public class ProductDataInitializer {
                         new BigDecimal("89.99"), new BigDecimal("74.99"),
                         40, "Accessories",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/3747463/pexels-photo-3747463.jpeg",
-                            "https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg"
+                            "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("One Size"),
                         Arrays.asList("Black", "Navy"),
@@ -361,7 +378,8 @@ public class ProductDataInitializer {
                         new BigDecimal("199.99"), new BigDecimal("169.99"),
                         28, "Wearables",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/125779/pexels-photo-125779.jpeg"
+                            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("42mm", "46mm"),
                         Arrays.asList("Smoke Steel", "Brown Leather"),
@@ -374,7 +392,8 @@ public class ProductDataInitializer {
                         new BigDecimal("24.99"), null,
                         200, "Home & Kitchen",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/585750/pexels-photo-585750.jpeg"
+                            "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("350ml", "480ml"),
                         Arrays.asList("White", "Black", "Rose Quartz"),
@@ -387,7 +406,8 @@ public class ProductDataInitializer {
                         new BigDecimal("49.99"), null,
                         55, "Accessories",
                         Arrays.asList(
-                            "https://images.pexels.com/photos/4219654/pexels-photo-4219654.jpeg"
+                            "https://images.unsplash.com/photo-1625948515291-69613efd103f?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1586953208270-31a4db8f9fe1?auto=format&fit=crop&w=600&q=80"
                         ),
                         Arrays.asList("One Size"),
                         Arrays.asList("Black", "Basalt"),

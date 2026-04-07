@@ -33,19 +33,36 @@ public class CartService {
 	@Retry(name = "retryBreaker", fallbackMethod = "addToCartFallBack")
 	public boolean addToCart(String userId, CartItemRequest request) {
 		System.out.println("ATTEMPT COUNT: " + ++attempt);
-		ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
-		if (productResponse == null || productResponse.getStockQuantity() < request.getQuantity())
-			return false;
+		
+		// Try to validate product, but allow adding even if product service is unavailable
+		try {
+			ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
+			if (productResponse != null && productResponse.getStockQuantity() < request.getQuantity()) {
+				System.out.println("Product out of stock: " + request.getProductId());
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println("Product service unavailable, proceeding with cart add: " + e.getMessage());
+			// Continue with cart add even if product service is down
+		}
 
-		UserResponse userResponse = userServiceClient.getUserDetails(userId);
-		if (userResponse == null) {
-			return false;
+		// Try to validate user, but allow adding even if user service is unavailable
+		try {
+			UserResponse userResponse = userServiceClient.getUserDetails(userId);
+			if (userResponse == null) {
+				System.out.println("User not found but proceeding: " + userId);
+				// Don't block cart add if user service is down
+			}
+		} catch (Exception e) {
+			System.out.println("User service unavailable, proceeding with cart add: " + e.getMessage());
+			// Continue with cart add even if user service is down
 		}
 
 		CartItem existingCartItem = cartItemRepository.findByUserIdAndProductId(userId, request.getProductId());
 		if (existingCartItem != null) {
-			// Update the quantity
-			existingCartItem.setQuantity(existingCartItem.getQuantity() + request.getQuantity());
+			// Replace the quantity instead of adding to it
+			// This allows checkout to resync cart by re-posting all items
+			existingCartItem.setQuantity(request.getQuantity());
 			existingCartItem.setPrice(request.getPrice() != null ? request.getPrice() : BigDecimal.valueOf(1000.00));
 
 			// Update product details if provided
@@ -83,8 +100,37 @@ public class CartService {
 	}
 
 	public boolean addToCartFallBack(String userId, CartItemRequest request, Exception exception) {
+		System.out.println("addToCartFallBack triggered for userId: " + userId + ", productId: " + request.getProductId());
 		exception.printStackTrace();
-		return true;
+		
+		// Actually save the cart item in fallback
+		try {
+			CartItem existingCartItem = cartItemRepository.findByUserIdAndProductId(userId, request.getProductId());
+			if (existingCartItem != null) {
+				existingCartItem.setQuantity(request.getQuantity());
+				existingCartItem.setPrice(request.getPrice() != null ? request.getPrice() : BigDecimal.valueOf(1000.00));
+				if (request.getProductName() != null) existingCartItem.setProductName(request.getProductName());
+				if (request.getProductImage() != null) existingCartItem.setProductImage(request.getProductImage());
+				if (request.getSelectedColor() != null) existingCartItem.setSelectedColor(request.getSelectedColor());
+				if (request.getSelectedSize() != null) existingCartItem.setSelectedSize(request.getSelectedSize());
+				cartItemRepository.save(existingCartItem);
+			} else {
+				CartItem cartItem = new CartItem();
+				cartItem.setUserId(userId);
+				cartItem.setProductId(request.getProductId());
+				cartItem.setQuantity(request.getQuantity());
+				cartItem.setPrice(request.getPrice() != null ? request.getPrice() : BigDecimal.valueOf(1000.00));
+				cartItem.setProductName(request.getProductName());
+				cartItem.setProductImage(request.getProductImage());
+				cartItem.setSelectedColor(request.getSelectedColor());
+				cartItem.setSelectedSize(request.getSelectedSize());
+				cartItemRepository.save(cartItem);
+			}
+			return true;
+		} catch (Exception e) {
+			System.out.println("Fallback also failed: " + e.getMessage());
+			return false;
+		}
 	}
 
 	public boolean deleteItemFromCart(String userId, String productId) {

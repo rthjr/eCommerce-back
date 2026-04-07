@@ -105,4 +105,45 @@ public class EmailService {
             event.getTimestamp()
         );
     }
+    
+    @Async
+    public void sendPaymentPendingEmail(String toEmail, String userName, PaymentEvent event) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("⏳ Payment Pending - Order " + event.getOrderId());
+            message.setText(buildPaymentPendingContent(userName, event));
+            
+            mailSender.send(message);
+            log.info("✓ Payment pending email sent to: {}", toEmail);
+            
+        } catch (Exception e) {
+            log.error("❌ Failed to send payment pending email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+    
+    private String buildPaymentPendingContent(String userName, PaymentEvent event) {
+        return String.format(
+            "Hello %s,\n\n" +
+            "⏳ Your payment is still pending.\n\n" +
+            "Payment Details:\n" +
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+            "Order ID: %s\n" +
+            "Amount Due: %s %s\n" +
+            "Payment Method: %s\n" +
+            "Date: %s\n" +
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+            "Please complete your payment to proceed with your order.\n\n" +
+            "If you have already made the payment, please wait a few moments for it to be processed.\n\n" +
+            "Best regards,\n" +
+            "E-Commerce Team",
+            userName,
+            event.getOrderId(),
+            event.getAmount(),
+            event.getCurrency(),
+            event.getPaymentMethod(),
+            event.getTimestamp()
+        );
+    }
 }

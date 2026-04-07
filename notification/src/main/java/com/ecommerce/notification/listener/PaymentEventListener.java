@@ -33,6 +33,11 @@ public class PaymentEventListener {
                             event.getOrderId(), event.getFailureReason());
                     notificationService.sendPaymentFailedNotification(event);
                     break;
+                case PAYMENT_PENDING:
+                    log.info("⏳ PAYMENT PENDING: Order {} - Amount: {} {}", 
+                            event.getOrderId(), event.getAmount(), event.getCurrency());
+                    notificationService.sendPaymentPendingNotification(event);
+                    break;
                 case REFUND_PROCESSED:
                     log.info("💰 REFUND PROCESSED: Order {} - Amount: {} {}", 
                             event.getOrderId(), event.getAmount(), event.getCurrency());
