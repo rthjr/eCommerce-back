@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/order
-    username: rthjr
-    password: rthjr
+    username: embarkx
+    password: embarkx
   rabbitmq:
     connection-timeout: ${CONNECTION_TIMEOUT:30000}
     addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
