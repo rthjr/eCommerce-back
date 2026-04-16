@@ -66,6 +66,7 @@ public class RabbitMQConfiguration {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
         template.setExchange(exchangeName);
+        template.setObservationEnabled(true);
         return template;
     }
 }
