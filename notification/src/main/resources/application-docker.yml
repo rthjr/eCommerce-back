@@ -2,13 +2,22 @@ spring:
   application:
     name: notification
   rabbitmq:
-    host: ${RABBITMQ_HOST:rabbit}
+    host: ${RABBITMQ_HOST:rabbitmq}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        observation-enabled: true
+      direct:
+        observation-enabled: true
 
 server:
   port: 8084
+
+app:
+  user-service:
+    url: ${USER_SERVICE_URL:http://host.docker.internal:8082}
 
 rabbitmq:
   queue:
@@ -17,3 +26,11 @@ rabbitmq:
     name: order.exchange
   routing:
     key: order.tracking
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT:http://zipkin:9411/api/v2/spans}

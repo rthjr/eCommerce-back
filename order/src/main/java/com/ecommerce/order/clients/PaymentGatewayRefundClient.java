@@ -2,7 +2,11 @@ package com.ecommerce.order.clients;
 
 import com.ecommerce.order.dtos.PaymentGatewayRefundRequest;
 import com.ecommerce.order.dtos.PaymentGatewayRefundResponse;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
+import io.micrometer.tracing.propagation.Propagator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,9 +25,30 @@ public class PaymentGatewayRefundClient {
 
     public PaymentGatewayRefundClient(
             @Value("${payment.gateway.base-url:http://localhost:8976}") String paymentGatewayBaseUrl,
-            @Value("${payment.gateway.internal-api-key:}") String internalApiKey
+            @Value("${payment.gateway.internal-api-key:}") String internalApiKey,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider,
+            ObjectProvider<Tracer> tracerProvider,
+            ObjectProvider<Propagator> propagatorProvider
     ) {
-        this.restClient = RestClient.builder().baseUrl(paymentGatewayBaseUrl).build();
+        ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+        Tracer tracer = tracerProvider.getIfAvailable();
+        Propagator propagator = propagatorProvider.getIfAvailable();
+
+        RestClient.Builder restClientBuilder = RestClient.builder().baseUrl(paymentGatewayBaseUrl);
+        if (observationRegistry != null && tracer != null && propagator != null) {
+            restClientBuilder.requestInterceptor((request, body, execution) -> {
+                if (tracer.currentSpan() != null) {
+                    propagator.inject(
+                            tracer.currentTraceContext().context(),
+                            request.getHeaders(),
+                            (carrier, key, value) -> carrier.add(key, value)
+                    );
+                }
+                return execution.execute(request, body);
+            });
+        }
+
+        this.restClient = restClientBuilder.build();
         this.internalApiKey = internalApiKey;
     }
 

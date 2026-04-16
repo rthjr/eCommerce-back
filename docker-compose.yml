@@ -40,6 +40,65 @@ services:
     networks:
       - backend
     restart: unless-stopped
+
+  notification:
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    container_name: notification_service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      USER_SERVICE_URL: http://host.docker.internal:8082
+      EUREKA_CLIENT_ENABLED: "false"
+      SPRING_CLOUD_DISCOVERY_ENABLED: "false"
+    ports:
+      - "8084:8084"
+    depends_on:
+      - rabbitmq
+      - zipkin
+    networks:
+      - backend
+    restart: unless-stopped
+    profiles:
+      - local-observability
+
+  payment-gateway:
+    build:
+      context: ./payment-gateway
+      dockerfile: Dockerfile
+    container_name: payment_gateway
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      OTEL_SERVICE_NAME: payment-gateway
+    ports:
+      - "8976:8976"
+    depends_on:
+      - rabbitmq
+      - zipkin
+    networks:
+      - backend
+    restart: unless-stopped
+    profiles:
+      - local-observability
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - backend
+    restart: unless-stopped
+    profiles:
+      - local-observability
 networks:
   backend:
     driver: bridge
