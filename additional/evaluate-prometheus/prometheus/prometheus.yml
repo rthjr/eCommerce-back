@@ -6,6 +6,7 @@ scrape_configs:
       - targets: ['host.docker.internal:8081']
         labels:
           application: 'product-service'
+          service: 'product-service'
   - job_name: 'user-service'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 3s
@@ -13,6 +14,7 @@ scrape_configs:
       - targets: ['host.docker.internal:8082']
         labels:
           application: 'user-service'
+          service: 'user-service'
   - job_name: 'order-service'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 3s
@@ -20,10 +22,21 @@ scrape_configs:
       - targets: ['host.docker.internal:8083']
         labels:
           application: 'order-service'
+          service: 'order-service'
   - job_name: 'payment-service'
     metrics_path: '/metrics'
     scrape_interval: 3s
     static_configs:
       - targets: ['host.docker.internal:8976']
         labels:
-          application: 'payment-service'
+          application: 'payment-service'
+          service: 'payment-service'
+
+  - job_name: 'notification'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['host.docker.internal:8084']
+        labels:
+          application: 'notification'
+          service: 'notification'

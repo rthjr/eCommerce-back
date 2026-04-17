@@ -28,6 +28,13 @@ rabbitmq:
     key: order.tracking
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      enabled: true
   tracing:
     sampling:
       probability: 1.0

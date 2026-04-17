@@ -19,6 +19,11 @@ local.file_match "spring_services" {
       service   = "user-service",
       env       = "local",
     },
+    {
+      __path__ = "/logs/notification/notification-service.log",
+      service   = "notification-service",
+      env       = "local",
+    },
   ]
 }
 
@@ -53,7 +58,7 @@ loki.source.file "python_logs" {
 loki.process "parse_spring" {
   // Merge multi-line stack traces into one log entry
   stage.multiline {
-    firstline     = "^\\d{4}-\\d{2}-\\d{2}T"
+    firstline     = "^\\d{4}-\\d{2}-\\d{2}[T ]"
     max_wait_time = "3s"
   }
 

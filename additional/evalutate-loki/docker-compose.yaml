@@ -47,10 +47,11 @@ services:
     image: grafana/alloy:latest
     volumes:
       - ./alloy-local-config.yaml:/etc/alloy/config.alloy:ro
-      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/product/logs:/logs/product:ro
-      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/order/logs:/logs/order:ro
-      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/user/logs:/logs/user:ro
-      - C:/Users/sovan/Desktop/Defend Project/fullstack/ecom-applications/payment-gateway/logs:/logs/payment:ro
+      - ../../product/logs:/logs/product:ro
+      - ../../order/logs:/logs/order:ro
+      - ../../user/logs:/logs/user:ro
+      - ../../notification/logs:/logs/notification:ro
+      - ../../payment-gateway/logs:/logs/payment:ro
     command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - 42345:12345
