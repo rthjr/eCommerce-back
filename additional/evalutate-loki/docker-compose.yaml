@@ -51,7 +51,8 @@ services:
       - ../../order/logs:/logs/order:ro
       - ../../user/logs:/logs/user:ro
       - ../../notification/logs:/logs/notification:ro
-      - ../../payment-gateway/logs:/logs/payment:ro
+      - ../../payment/logs:/logs/payment:ro
+      - ../../payment-gateway/logs:/logs/payment-gateway:ro
     command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - 42345:12345

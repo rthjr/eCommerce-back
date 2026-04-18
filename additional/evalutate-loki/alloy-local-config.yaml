@@ -113,3 +113,8 @@ loki.write "default" {
   }
   external_labels = {}
 }
+    {
+      __path__ = "/logs/payment/payment-service.log",
+      service   = "payment-service",
+      env       = "local",
+    },

@@ -36,6 +36,8 @@ management:
     prometheus:
       enabled: true
   tracing:
+    propagation:
+      type: w3c,b3
     sampling:
       probability: 1.0
   zipkin:

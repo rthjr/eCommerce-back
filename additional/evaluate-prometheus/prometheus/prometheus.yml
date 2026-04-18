@@ -40,3 +40,11 @@ scrape_configs:
         labels:
           application: 'notification'
           service: 'notification'
+  - job_name: 'payment-service-java'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 3s
+    static_configs:
+      - targets: ['host.docker.internal:8089']
+        labels:
+          application: 'payment-service-java'
+          service: 'payment-service-java'

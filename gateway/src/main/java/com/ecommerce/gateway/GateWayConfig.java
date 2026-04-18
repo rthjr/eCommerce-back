@@ -61,6 +61,9 @@ public class GateWayConfig {
 //                        .filters(f -> f.rewritePath("/(?<segment>.*)",
 //                                "/api/${segment}"))
 						.uri("lb://ORDER-SERVICE"))
+				.route("payment-service", r -> r.path("/api/payments/**")
+						.filters(f -> f.rewritePath("/api/payments(?<segment>/?.*)", "${segment}"))
+						.uri("lb://PAYMENT-SERVICE"))
 				.route("eureka-server",
 						r -> r.path("/eureka/main").filters(f -> f.rewritePath("/eureka/main", "/"))
 								.uri("http://localhost:8761"))
