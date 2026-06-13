@@ -99,6 +99,26 @@ services:
     restart: unless-stopped
     profiles:
       - local-observability
+
+  correlation:
+    build:
+      context: ./correlation
+      dockerfile: Dockerfile
+    container_name: correlation_service
+    environment:
+      PROMETHEUS_BASE_URL: ${PROMETHEUS_BASE_URL:-http://host.docker.internal:9090}
+      LOKI_BASE_URL: ${LOKI_BASE_URL:-http://host.docker.internal:3100}
+      ZIPKIN_BASE_URL: ${ZIPKIN_BASE_URL:-http://zipkin:9411}
+      GRAFANA_DASHBOARD_URL: ${GRAFANA_DASHBOARD_URL:-http://host.docker.internal:3000/d/correlation}
+    ports:
+      - "8091:8091"
+    depends_on:
+      - zipkin
+    networks:
+      - backend
+    restart: unless-stopped
+    profiles:
+      - local-observability
 networks:
   backend:
     driver: bridge

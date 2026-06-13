@@ -90,6 +90,7 @@ public class SellerOrderService {
         stats.put("total", allOrders.size());
         stats.put("pending", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.PENDING).count());
         stats.put("confirmed", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.CONFIRMED).count());
+        stats.put("paid", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.PAID).count());
         stats.put("shipped", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.SHIPPED).count());
         stats.put("delivered", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.DELIVERED).count());
         stats.put("cancelled", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.CANCELLED).count());

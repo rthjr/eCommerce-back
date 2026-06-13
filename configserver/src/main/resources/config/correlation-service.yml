@@ -1,0 +1,36 @@
+server:
+  port: 8091
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+
+correlation:
+  lookback: 10m
+  max-log-lines: 250
+  max-trace-ids: 20
+  cache-ttl: 5m
+  backend-timeout: 2s
+  grafana-dashboard-url: ${GRAFANA_DASHBOARD_URL:http://localhost:3000/d/correlation}
+  log-level-filter: ${CORRELATION_LOG_LEVEL_FILTER:ERROR}
+  root-cause-keywords:
+    - timeout
+    - exception
+    - refused
+    - database
+    - deadlock
+    - unavailable
+  prometheus:
+    base-url: ${PROMETHEUS_BASE_URL:http://localhost:9090}
+    metric-query-template: ${CORRELATION_PROM_QUERY:histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="%s"}[5m])) by (le))}
+  loki:
+    base-url: ${LOKI_BASE_URL:http://localhost:3100}
+  zipkin:
+    base-url: ${ZIPKIN_BASE_URL:http://localhost:9411}

@@ -91,6 +91,41 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
+    depends_on:
+      - alertmanager
+    networks:
+      - loki
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    depends_on:
+      - correlation
+    networks:
+      - loki
+
+  correlation:
+    build:
+      context: ../../correlation
+      dockerfile: Dockerfile
+    container_name: correlation
+    environment:
+      PROMETHEUS_BASE_URL: http://prometheus:9090
+      LOKI_BASE_URL: http://gateway:3100
+      ZIPKIN_BASE_URL: http://zipkin:9411
+      GRAFANA_DASHBOARD_URL: http://localhost:3000/d/correlation
+    ports:
+      - "8091:8091"
+    depends_on:
+      - gateway
+      - zipkin
     networks:
       - loki
 
@@ -103,6 +138,7 @@ services:
     depends_on:
       - gateway
       - prometheus
+      - correlation
     ports:
       - "3000:3000"
     healthcheck:

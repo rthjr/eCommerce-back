@@ -64,7 +64,7 @@ loki.process "parse_spring" {
 
   // Extract level, logger, and thread from the Spring Boot log format
   stage.regex {
-    expression = "^(?P<timestamp>\\S+)\\s+(?P<level>\\w+)\\s+\\d+\\s+---\\s+\\[(?P<app>[^\\]]+)\\]\\s+\\[(?P<thread>[^\\]]+)\\].*?(?P<logger>[\\w\\.\\$]+)\\s*:"
+    expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\s+(?P<level>\\w+)\\s+(?:\\[service=(?P<service>[^,\\]]+),trace_id=(?P<trace_id>[^,\\]]*),span_id=(?P<span_id>[^\\]]*)\\]\\s+)?\\S+\\s+---\\s+\\[(?P<thread>[^\\]]+)\\]\\s+.*?(?P<logger>[\\w\\.\\$]+)\\s*:"
   }
 
   stage.labels {
@@ -72,6 +72,9 @@ loki.process "parse_spring" {
       level  = "level",
       logger = "logger",
       thread = "thread",
+      service = "service",
+      trace_id = "trace_id",
+      span_id = "span_id",
     }
   }
 
@@ -89,6 +92,7 @@ loki.process "parse_python" {
       level   = "levelname",
       logger  = "name",
       message = "message",
+      trace_id = "trace_id",
     }
   }
 
@@ -96,6 +100,7 @@ loki.process "parse_python" {
     values = {
       level  = "level",
       logger = "logger",
+      trace_id = "trace_id",
     }
   }
 
@@ -113,8 +118,3 @@ loki.write "default" {
   }
   external_labels = {}
 }
-    {
-      __path__ = "/logs/payment/payment-service.log",
-      service   = "payment-service",
-      env       = "local",
-    },

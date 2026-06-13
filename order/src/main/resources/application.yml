@@ -3,6 +3,20 @@ spring:
     name: order-service
   config:
     import: optional:configserver:http://localhost:8888
+  rabbitmq:
+    listener:
+      simple:
+        observation-enabled: true
+      direct:
+        observation-enabled: true
+    template:
+      observation-enabled: true
+
+payment:
+  status:
+    exchange: payment.status.exchange
+    queue: payment.status.queue
+    routing-key: payment.status.paid
 #spring:
 #  application:
 #    name: order-service

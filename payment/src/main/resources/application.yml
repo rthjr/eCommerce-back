@@ -1,6 +1,14 @@
 spring:
   application:
     name: PAYMENT-SERVICE
+  rabbitmq:
+    listener:
+      simple:
+        observation-enabled: true
+      direct:
+        observation-enabled: true
+    template:
+      observation-enabled: true
 
 server:
   port: 8089
@@ -8,6 +16,9 @@ server:
 payment:
   gateway:
     url: http://localhost:8976
+  status:
+    exchange: payment.status.exchange
+    routing-key: payment.status.paid
 
 eureka:
   client:
@@ -40,3 +51,5 @@ logging:
     com.ecom.payment: DEBUG
   file:
     name: logs/payment-service.log
+  pattern:
+    level: "%5p [service=${spring.application.name},trace_id=%X{traceId:-},span_id=%X{spanId:-}]"

@@ -6,6 +6,13 @@ spring:
   rabbitmq:
     connection-timeout: ${CONNECTION_TIMEOUT:30000}
     addresses: amqps://exnddjpl:t2JWuxv4dfjNPSCw-L9V9519lSM2DMSG@cougar.rmq.cloudamqp.com/exnddjpl
+    listener:
+      simple:
+        observation-enabled: true
+      direct:
+        observation-enabled: true
+    template:
+      observation-enabled: true
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -50,6 +57,10 @@ payment:
   gateway:
     base-url: ${PAYMENT_GATEWAY_BASE_URL:http://localhost:8976}
     internal-api-key: ${PAYMENT_GATEWAY_INTERNAL_API_KEY:change-me-in-env}
+  status:
+    exchange: payment.status.exchange
+    queue: payment.status.queue
+    routing-key: payment.status.paid
 
 refund:
   scheduler:
@@ -67,6 +78,8 @@ eureka:
 logging:
   file:
     name: logs/${spring.application.name}.log
+  pattern:
+    level: "%5p [service=${spring.application.name},trace_id=%X{traceId:-},span_id=%X{spanId:-}]"
   logback:
     rollingpolicy:
       max-file-size: 5MB

@@ -60,12 +60,12 @@ loki.source.file "parent_app_file_scrape" {
 loki.process "parse_spring" {
 	// Merge multi-line stack traces
 	stage.multiline {
-		firstline     = "^\\d{4}-\\d{2}-\\d{2}T"
+		firstline     = "^\\d{4}-\\d{2}-\\d{2}[T ]"
 		max_wait_time = "3s"
 	}
 
 	stage.regex {
-		expression = "^(?P<timestamp>\\S+)\\s+(?P<level>\\w+)\\s+\\d+\\s+---\\s+\\[(?P<app>[^\\]]+)\\]\\s+\\[(?P<thread>[^\\]]+)\\].*?(?P<logger>[\\w\\.\\$]+)\\s*:"
+		expression = "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\s+(?P<level>\\w+)\\s+(?:\\[service=(?P<service>[^,\\]]+),trace_id=(?P<trace_id>[^,\\]]*),span_id=(?P<span_id>[^\\]]*)\\]\\s+)?\\S+\\s+---\\s+\\[(?P<thread>[^\\]]+)\\]\\s+.*?(?P<logger>[\\w\\.\\$]+)\\s*:"
 	}
 
 	stage.labels {
@@ -73,6 +73,9 @@ loki.process "parse_spring" {
 			level  = "level",
 			logger = "logger",
 			thread = "thread",
+			service = "service",
+			trace_id = "trace_id",
+			span_id = "span_id",
 		}
 	}
 
@@ -107,6 +110,7 @@ loki.process "parse_python" {
 			level   = "levelname",
 			logger  = "name",
 			message = "message",
+			trace_id = "trace_id",
 		}
 	}
 
@@ -114,6 +118,7 @@ loki.process "parse_python" {
 		values = {
 			level  = "level",
 			logger = "logger",
+			trace_id = "trace_id",
 		}
 	}
 

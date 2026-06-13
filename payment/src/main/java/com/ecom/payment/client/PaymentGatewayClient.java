@@ -14,7 +14,7 @@ public class PaymentGatewayClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${payment.gateway.url:http://0.0.0.0:8000}")
+    @Value("${payment.gateway.url:http://localhost:8976}")
     private String gatewayUrl;
 
     public OrderResponse createOrder(CreateOrderRequest request) {

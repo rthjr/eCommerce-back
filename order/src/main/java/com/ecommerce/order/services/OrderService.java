@@ -2,6 +2,8 @@ package com.ecommerce.order.services;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -233,6 +235,49 @@ public class OrderService {
 			}
 			return orderRepository.save(order);
 		}).map(this::mapToOrderResponse);
+	}
+
+	public boolean markAsPaidFromPaymentMessage(String rawOrderId, String paidAt) {
+		Long orderId;
+		try {
+			orderId = Long.parseLong(rawOrderId);
+		} catch (NumberFormatException ex) {
+			return false;
+		}
+
+		return orderRepository.findById(orderId).map(order -> {
+			if (Boolean.TRUE.equals(order.getIsPaid()) && order.getStatus() == OrderStatus.PAID) {
+				return false;
+			}
+
+			order.setIsPaid(true);
+			order.setStatus(OrderStatus.PAID);
+			order.setPaidAt(resolvePaidAt(paidAt));
+
+			com.ecommerce.order.models.PaymentResult payment = order.getPaymentResult();
+			if (payment == null) {
+				payment = new com.ecommerce.order.models.PaymentResult();
+			}
+			payment.setStatus("PAID");
+			if (paidAt != null && !paidAt.isBlank()) {
+				payment.setUpdateTime(paidAt);
+			}
+			order.setPaymentResult(payment);
+
+			orderRepository.save(order);
+			return true;
+		}).orElse(false);
+	}
+
+	private java.time.LocalDateTime resolvePaidAt(String paidAt) {
+		if (paidAt == null || paidAt.isBlank()) {
+			return java.time.LocalDateTime.now();
+		}
+		try {
+			return OffsetDateTime.parse(paidAt).toLocalDateTime();
+		} catch (DateTimeParseException ex) {
+			return java.time.LocalDateTime.now();
+		}
 	}
 
 	// Mark order as delivered (admin)

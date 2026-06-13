@@ -36,6 +36,8 @@ eureka:
 logging:
   file:
     name: logs/${spring.application.name}.log
+  pattern:
+    level: "%5p [service=${spring.application.name},trace_id=%X{traceId:-},span_id=%X{spanId:-}]"
   logback:
     rollingpolicy:
       max-file-size: 5MB

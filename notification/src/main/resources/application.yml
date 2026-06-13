@@ -68,6 +68,8 @@ logging:
     com.ecommerce.notification: DEBUG
     org.springframework.cloud.stream: DEBUG
     org.springframework.amqp: DEBUG
+  pattern:
+    level: "%5p [service=${spring.application.name},trace_id=%X{traceId:-},span_id=%X{spanId:-}]"
 
 management:
   endpoints:

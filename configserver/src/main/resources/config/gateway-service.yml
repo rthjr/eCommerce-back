@@ -43,6 +43,9 @@ eureka:
 #    root: info
 #    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
 #    org.springframework.cloud.gateway: TRACE
+logging:
+  pattern:
+    level: "%5p [service=${spring.application.name},trace_id=%X{traceId:-},span_id=%X{spanId:-}]"
 
 management:
   endpoints:
